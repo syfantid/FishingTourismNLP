@@ -2,6 +2,7 @@ from textblob import TextBlob
 from nltk.tag import pos_tag
 from wnaffect.wnaffect import WNAffect
 from nltk.tokenize import word_tokenize
+from collections import Counter
 
 
 def get_review_sentiment(text):
@@ -128,7 +129,16 @@ def get_emotions_from_emojis(text):
     except TypeError:
         print('blank post')
 
-    return joy, anger, disgust, fear, sadness, surprise
+    joy = Counter(joy).most_common()
+    anger = Counter(anger).most_common()
+    disgust = Counter(disgust).most_common()
+    fear = Counter(fear).most_common()
+    sadness = Counter(sadness).most_common()
+    surprise = Counter(surprise).most_common()
+
+    emo = []
+
+    return emo.extend((joy, anger, disgust, fear, sadness, surprise))
 
 
 def get_all_emoji_emotions(texts):
@@ -153,7 +163,10 @@ def get_all_emoji_emotions(texts):
 
 # df['text_sentiment'] = df['text'].apply(lambda x: get_review_sentiment(x))
 # df['text_emotion'] = df['text'].apply(lambda x: get_review_emotion(x))
-# df['text_emojis_emotion'] = df['text'].apply(lambda x: get_emotions_from_emojis(text)) #todo DIMITRA fix this issue
+# df['text_emojis_emotion'] = df['text'].apply(lambda x: get_emotions_from_emojis(x)) #todo DIMITRA - does not identify the emojis
+
+
+
 
 
 

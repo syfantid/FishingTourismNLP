@@ -49,6 +49,7 @@ def create_annotation_files(df_sample, examples_number, annotators_number):
         df_file_sample.to_excel(filepath, index=False, index_label=False)
 
 
-df = read_comments_from_files()
-df_sample = get_df_subset(df, 200)
-create_annotation_files(df_sample, 60, 5)
+def get_annotation_files():
+    df = read_comments_from_files()
+    df_sample = get_df_subset(df, 200)
+    create_annotation_files(df_sample, 60, 5)

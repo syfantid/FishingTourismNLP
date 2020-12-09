@@ -1,3 +1,7 @@
+"""
+This is a Python script to scrape business profiles from TripAdvisor based on a list of URLs.
+"""
+
 import math
 import os
 import time
@@ -114,19 +118,19 @@ def get_review_text(full_review):
     return text
 
 
-def write_to_file(output_filename, reviews):
+def write_to_file(output_filename, reviews, output_path=OUTPUT_PATH):
     """
     Function to append reviews to file
     :param output_filename: The name of the output file to write the reviews
     :param reviews: The reviews to be appended
     :return: None
     """
-    output_filepath = os.path.join(OUTPUT_PATH, output_filename)
+    output_filepath = os.path.join(output_path, output_filename)
     if Path(output_filepath).is_file():
         reviews.to_csv(output_filepath, mode='a', header=False)
     else:
-        if not os.path.exists(OUTPUT_PATH):
-            os.mkdir(OUTPUT_PATH)
+        if not os.path.exists(output_path):
+            os.mkdir(output_path)
         reviews.to_csv(output_filepath)
 
 

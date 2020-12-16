@@ -281,7 +281,7 @@ URLs = read_comments_from_files()['reviewer_profile']
 
 # Reads a URL at a time and calls the scraping function
 # for url in tqdm(reversed(URLs)): # inverse order
-for url in tqdm(URLs[300:]): # correct order
+for url in tqdm(URLs[796:]): # correct order
     try:
         driver.set_page_load_timeout(10)
         get_user_profile_by_url(url)

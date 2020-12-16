@@ -10,7 +10,7 @@ Changes from the original script:
 * Added support for Firefox driver
 * Added progress bards to monitor scraper's progress
 """
-
+import errno
 import os
 import csv
 import re
@@ -28,13 +28,13 @@ from selenium.webdriver import Firefox
 from selenium.webdriver.firefox.options import Options
 from data_annotation.annotation_file_extractor import read_comments_from_files
 from data_collection.scraper_businesses import write_to_file
+from data_collection.scraper_user_badges import get_username_from_url
 
 options = Options()
 # options.add_argument('--headless')
 options.add_argument('--hide-scrollbars')
 options.add_argument('--disable-gpu')
 options.add_argument('lang=en')
-
 
 # driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
 # driver = webdriver.Firefox(GeckoDriverManager().install(), options=options)
@@ -61,6 +61,7 @@ def check_exists_by_xpath(xpath):
     return True
     time.sleep(2)
 
+
 def regex_match(regex, text):
     try:
         result = re.search(regex, text)
@@ -71,6 +72,7 @@ def regex_match(regex, text):
     except:
         result = ""
     return result
+
 
 def extract_member_since(popup_text):
     regex = (r"Tripadvisor member since ([0-9]{4})\n")
@@ -111,6 +113,7 @@ def extract_popup_info(popup_text):
     contributions = extract_contributions(popup_text)
     return gender, age, location, member_since, cities_visited, contributions
 
+
 def get_tags():
     tags_list = driver.find_elements_by_class_name("memberTagReviewEnhancements")
     tags_text = []
@@ -127,12 +130,18 @@ def check_cookie_popup():
     except:
         print("\nNo cookie pop-up!")
 
-def get_user_popup(url):
+
+def get_user_profile_by_url(url):
     """
-    Get the demographics (if available from a user's profile
-    :param url: The user's profile URL to be scraped
-    :return: None, simply calls function to write demographics to file
+        Get the demographics (if available from a user's profile
+        :param url: The user's profile URL to be scraped
+        :return: None, simply calls function to write demographics to file
     """
+    print("\nScraping: " + url)
+
+    driver.get(url)
+    driver.maximize_window()
+
     check_cookie_popup()
 
     # go to reviews' tab
@@ -156,7 +165,8 @@ def get_user_popup(url):
     time.sleep(2)
 
     # scroll the viewpoint to the review and open up the pop-up window
-    popup_element_link = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.CLASS_NAME, "expand_inline.scrname")))
+    popup_element_link = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.CLASS_NAME, "expand_inline.scrname")))
     driver.execute_script("arguments[0].scrollIntoView();", popup_element_link)
     ActionChains(driver).move_to_element(popup_element_link).click().perform()
     time.sleep(1)
@@ -173,7 +183,10 @@ def get_user_popup(url):
             popup_text = popup_element.text
             tags = get_tags()
             gender, age, location, member_since, cities_visited, contributions = extract_popup_info(popup_text)
-            return gender, age, location, member_since, cities_visited, contributions, tags
+            print("\nGender: " + gender + " - Age: " + age + " - Location: " + location
+                  + " - Member Since: " + member_since + " - Cities: " + cities_visited + " - Contributions: "
+                  + contributions)
+            return [gender, age, location, member_since, cities_visited, contributions, tags]
         except Exception as e:
             print("Problem with extracting data from pop-up window for user " + url + ": " + str(e))
     else:
@@ -181,54 +194,47 @@ def get_user_popup(url):
 
     driver.close()
     driver.switch_to.window(driver.window_handles[0])
-    return None
+    return []
 
 
-def get_user_profile_by_url(url):
-    """
-    Based on the given URL, we scrape the respective user's profile
-    :param url: The profile URL to be scraped
-    :return: None, simply handles the scraping process and writes to file
-    """
-    print("\nScraping: " + url)
-    # get the name of place for csv file name
-    global filename
-
-    driver.get(url)
-    driver.maximize_window()
-
-    # username as the filename
-    username = driver.find_element_by_class_name("gf69u3Nd").text
-    filename = os.path.join('output_demographics', username + ".csv")
-
-    return get_user_popup(url)
+def make_directory(directory_name):
+    try:
+        os.mkdir(directory_name)
+    except OSError as e:
+        if e.errno != errno.EEXIST:
+            raise
 
 
 def get_all_user_demographics():
     # Reads all user profiles' URLs from the users who have reviewed fishing tourism businesses
     URLs = read_comments_from_files()['reviewer_profile']
-    # URLs = ['https://www.tripadvisor.com/Profile/130Doug'] # test URL
-    # Reads a URL at a time and calls the scraping function
-    df = pd.DataFrame(columns=["url", "gender", "age", "location", "member_since", "cities_visited", "contributions"])
-    for url in tqdm(URLs): # correct order
+
+    columns = ["url", "gender", "age", "location", "member_since", "cities_visited", "contributions"]
+
+    # create output directory if it doesn't exist
+    directory_name = "output_demographics"
+    make_directory(directory_name)
+
+    for url in tqdm(URLs[2:]):  # correct order
         try:
-            driver.set_page_load_timeout(10)
-            gender, age, location, member_since, cities_visited, contributions, tags = get_user_profile_by_url(url)
-            print()
-            print("url",url, "gender:",gender, "age:",age, "location:",location, "member_since:",member_since,
-                            "cities_visited:",cities_visited, "contributions:",contributions, "tags:",tags)
-            df = df.append({"url":url, "gender":gender, "age":age, "location":location, "member_since":member_since,
-                            "cities_visited":cities_visited, "contributions":contributions, "tags":tags},
-                           ignore_index=True)
+            # Check if file already exists
+            filename = os.path.join(directory_name, get_username_from_url(url))
+            if os.path.isfile(filename):  # check if user's profile has been already parsed
+                print("\nUser's profile is already parsed in " + filename)
+                continue
+
+            # Get user's data
+            driver.set_page_load_timeout(5)
+            demographics_list = get_user_profile_by_url(url)
+
+            # Save user's data
+            with open(filename, 'a') as userfile:
+                userfile.write(','.join(columns))  # write column names
+                userfile.write('\n')
+                userfile.write(','.join(str(v) for v in demographics_list))  # write demographics to file
         except TimeoutException as e:
-            isrunning = 0
             print('\nThere is an issue, check again ' + url + " & Exception: " + str(e))
-            # driver.close()
+            driver.close()
 
-        print()
-
-    write_to_file('demographics.csv', df, output_path='output_demographics')
     print('\nProgram is complete.')
     driver.close()
-
-

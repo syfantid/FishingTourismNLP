@@ -50,7 +50,7 @@ def get_user_reviews(URL, endcount):
         # to expand the review 
         show_more_button = driver.find_element_by_xpath("//span[@class='_1ogwMK0l']")
         show_more_button.click()
-        time.sleep(30)
+        time.sleep(10)
 
     while driver.find_elements_by_xpath("//div[@style='position:relative']/div"):
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")

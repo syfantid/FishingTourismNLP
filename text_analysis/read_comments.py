@@ -7,7 +7,7 @@ from pathlib import Path
 INPUT_PATH = 'FishingTourismNLP/data_collection/output_reviews'
 
 def read_comments_from_files():
-    ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # This is your Project Root
+    ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath("__file__")))  # This is your Project Root
 
     absolute_input_path = os.path.join(ROOT_DIR, INPUT_PATH)
 

@@ -1,16 +1,26 @@
 import pandas as pd
-import nltk
 
+
+import nltk
 from nltk.corpus import stopwords
 from nltk import re
 from text_analysis.read_comments import read_comments_from_files
 from nltk.tokenize import word_tokenize, RegexpTokenizer
-
+from nltk.stem import WordNetLemmatizer
+from nltk.stem import PorterStemmer
 
 from wordcloud import WordCloud
 from nltk import FreqDist
 from nltk import bigrams
 from operator import itemgetter
+
+from sklearn.decomposition import LatentDirichletAllocation as LDA
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+import pyLDAvis
+import pyLDAvis.gensim
+
 
 
 def text_cleaning(text):
@@ -35,6 +45,37 @@ def text_cleaning(text):
 def text_token(text):
     words = word_tokenize(text)
     return words
+
+
+def text_lem(text):
+    lemmatizer = WordNetLemmatizer()
+    return [lemmatizer.lemmatize(w) for w in text]
+
+
+def text_stem(text):
+    stemmer = PorterStemmer()
+    return [stemmer.stem(word) for word in text]
+
+def dummy_fun(doc):
+    """ dummy function required for ngrams and tfidf tokenizer"""
+    return doc
+
+def ngrams(words, l1, l2):
+    """
+    words: words for which we create the vector
+    l1: lower limit for ngrams
+    l2: upper limit for ngrams
+    Returns the vectors and the vocaabulary
+    """
+    cv = CountVectorizer(ngram_range=(l1, l2), tokenizer=dummy_fun, preprocessor=dummy_fun, token_pattern=r'\b\w+\b', min_df=1)
+    ngrams = cv.fit_transform(words)
+    return ngrams, cv
+
+def tfidf(words):
+    vect = TfidfVectorizer(analyzer='word',tokenizer=dummy_fun,preprocessor=dummy_fun,token_pattern=None, max_df=1.0, min_df=1)
+    tfidf = vect.fit_transform(words)
+    return tfidf, vect
+
 
 
 def word_cloud(text):
@@ -81,18 +122,128 @@ def word_frequencies_graph(text):
     fig.savefig('word_frequencies_bar.png')
 
 
+def lda_topics(text, number_of_topics, number_words):
+
+    def print_topics(model, count_vectorizer, n_top_words):
+        words = count_vectorizer.get_feature_names()
+        for topic_idx, topic in enumerate(model.components_):
+            print("\nTopic #%d:" % topic_idx)
+            print(" ".join([words[i]
+                            for i in topic.argsort()[:-n_top_words - 1:-1]]))
+
+    # Tweak the two parameters below
+    number_topics = number_of_topics
+    number_words = number_words
+    # Create and fit the LDA model
+
+    # Initialise the count vectorizer with the English stop words
+    count_vectorizer = CountVectorizer()
+    # Fit and transform the processed titles
+    count_data = count_vectorizer.fit_transform(text)
+    vocabulary = count_vectorizer.vocabulary_
+    lda = LDA(n_components=number_topics, n_jobs=-1)
+    lda.fit(count_data)
+
+
+    # Print the topics found by the LDA model
+    # Initialise the count vectorizer with the English stop words
+    print("Topics found via LDA:")
+    print_topics(lda, count_vectorizer, number_words)
+
+    return lda, count_vectorizer, count_data, vocabulary
+
+
+#
+# import gensim
+# import pyLDAvis
+# import pyLDAvis.gensim  # don't skip this
+# from gensim import models
+#
+#
+# visualize_topics = True
+#
+#
+# def lda_topics(text): #text-tokens
+#     """
+#     This function performs LDA analysis on the combination of Twitter and Instagram posts and extracts topics
+#     Simultaneously, it also visualises the topics based on the PyLDAVis library and saves the result as an HTML file
+#     :return:
+#     """
+#     global visualize_topics
+#     texts = []
+#
+#     for tokens in text:
+#         texts.append(tokens)
+#
+#     num_topics = 10
+#
+#     dictionary = gensim.corpora.Dictionary(texts)
+#
+#     dictionary.filter_extremes(no_below=15, no_above=0.5, keep_n=100000)
+#     bow_corpus = [dictionary.doc2bow(doc) for doc in texts]
+#     tfidf = models.TfidfModel(bow_corpus)
+#     corpus_tfidf = tfidf[bow_corpus]
+#     lda_model = gensim.models.LdaMulticore(bow_corpus, num_topics=num_topics, id2word=dictionary, passes=2, workers=2)
+#
+#     topics = []
+#
+#     for idx, topic in lda_model.print_topics(-1):
+#
+#         topic_dict = dict()
+#         topic_dict["topic_id"] = idx
+#         topic_dict["topic_name"] = "topic_"+str(idx)
+#         topic_dict["significance"] = num_topics - idx
+#
+#         words = topic.split(" + ")
+#         topic_terms = []
+#
+#         for word in words:
+#             parts = word.replace("\"", "").split("*")
+#             weight = float(parts[0])
+#             term = parts[1]
+#
+#             item = {"term": term, "weight": weight}
+#             topic_terms.append(item)
+#
+#         topic_dict["terms"] = topic_terms
+#         topics.append(topic_dict)
+#
+#     if visualize_topics:
+#         # pyLDAvis.enable_notebook()
+#         vis = pyLDAvis.gensim.prepare(lda_model, bow_corpus, dictionary)
+#         pyLDAvis.save_html(vis, 'lda2.html')
+#
+#     return topics
+
+
 
 # df = read_comments_from_files()
 # df['text_p'] = df['text'].apply(lambda x: text_cleaning(x))
 # df['text_w'] = df['text_p'].apply(lambda x: text_token(x))
+# df['text_l'] = df['text_w'].apply(lambda x: text_lem(x))
+# df['text_s'] = df['text_w'].apply(lambda x: text_stem(x))
 # df['title_p'] = df['title'].apply(lambda x: text_cleaning(x))
 # df['title_w'] = df['title_p'].apply(lambda x: text_token(x))
+# df['title_l'] = df['title_w'].apply(lambda x: text_lem(x))
+
+# Ngram and tfidf Vectors
+# ngrams, ngram_voc = ngrams(df['text_l'], 2, 4) #returns bigrams and trigrams
+# tfidf, tfidf_voc = tfidf(df['text_l'])
+
+# # topics extraction
+# number_of_topics = _INSERT_
+# number_words = _INSERT_
+#
+# lda, count_vectorizer, count_data, vocab = lda_topics(df['text_p'], number_of_topics, number_words)
+# # Visualize lda --- todo gensim doesn't work on my Mac, try to run the code on your computer
+# pyLDAvis.enable_notebook()
+# vis = pyLDAvis.gensim.prepare(lda, count_data, vocab)
+# vis
+
 
 # Vizualization and stats - word clouds, word bars etc
 # word_cloud(df['text_p'])
 # ngrams_cloud(df['text_p'])
 # word_frequencies_graph(df['text_p'])
 
-#todo Dimitra! topic extraction LDA
-#todo Dimitra! words-ngrams coocurrence network visualization
 

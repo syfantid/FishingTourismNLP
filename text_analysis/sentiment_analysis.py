@@ -170,6 +170,11 @@ def get_all_emoji_emotions(texts):
 
 
 
+
+
+
+
+
 # all_positive_sentiment, all_negative_sentiment = get_all_sentiments()
 # print("Total positive sentiment" + str(sum(all_positive_sentiment)) + " of " + str(len(all_positive_sentiment)) + " english reviews...")
 # print("Total negative sentiment" + str(sum(all_negative_sentiment)) + " of " + str(len(all_negative_sentiment)) + " english reviews...")

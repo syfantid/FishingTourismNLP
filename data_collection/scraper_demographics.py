@@ -138,10 +138,16 @@ def get_user_profile_by_url(url):
         :return: None, simply calls function to write demographics to file
     """
     print("\nScraping: " + url)
+    # try:
+    #     driver.get(url)
+    #     driver.maximize_window()
+    #     check_cookie_popup()
+    # except Exception:
+    #     print("Cannot get demographics for this user")
+    #     return []
 
     driver.get(url)
     driver.maximize_window()
-
     check_cookie_popup()
 
     # go to reviews' tab
@@ -154,7 +160,7 @@ def get_user_profile_by_url(url):
         review = driver.find_elements_by_xpath("//div[@style='position:relative']/div")[0]
     except Exception:
         print("User has no reviews.")
-        return
+        return []
 
     # open up review in new tab
     review_summary = review.find_element_by_xpath(".//div[contains(@class, '_1kKLd-3D')]/a").get_attribute(
@@ -215,7 +221,7 @@ def get_all_user_demographics():
     directory_name = "output_demographics"
     make_directory(directory_name)
 
-    for url in tqdm(URLs[2:]):  # correct order
+    for url in tqdm(URLs):  # correct order
         try:
             # Check if file already exists
             filename = os.path.join(directory_name, get_username_from_url(url))
@@ -224,7 +230,7 @@ def get_all_user_demographics():
                 continue
 
             # Get user's data
-            driver.set_page_load_timeout(5)
+            driver.set_page_load_timeout(8)
             demographics_list = get_user_profile_by_url(url)
 
             # Save user's data
@@ -234,7 +240,7 @@ def get_all_user_demographics():
                 userfile.write(','.join(str(v) for v in demographics_list))  # write demographics to file
         except TimeoutException as e:
             print('\nThere is an issue, check again ' + url + " & Exception: " + str(e))
-            driver.close()
+            # driver.close()
 
     print('\nProgram is complete.')
     driver.close()

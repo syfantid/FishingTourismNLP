@@ -36,11 +36,7 @@ def create_annotation_files(df_sample, examples_number, annotators_number):
         if e.errno != errno.EEXIST:
             raise
 
-    labels_names = ["participate_fishing", "learn_fisheries_species", "learn_responsible_fishing",
-                    "learn_island_life_culture", "enjoy_view_crystal_water", "visit_remote_coasts_bays",
-                    "enjoy_landscape_seascape", "observe_marine_ecosystem", "enjoy_tour_traditional_vesssel",
-                    "cook_demonstration", "swim_and_snorkel", "eat_fish", "taste_local_products", "meet_people",
-                    "hosted_authentic_friendly_environment"]
+    labels_names = ["Education", "Entertainment", "Aestheticism", "Escape"]
 
     for file_counter in range(annotators_number):
         filepath = os.path.join(os.path.join(os.getcwd(), output_dir_name), "file_" + str(file_counter) + ".xlsx")
@@ -53,3 +49,5 @@ def get_annotation_files():
     df = read_comments_from_files()
     df_sample = get_df_subset(df, 200)
     create_annotation_files(df_sample, 60, 5)
+
+get_annotation_files()

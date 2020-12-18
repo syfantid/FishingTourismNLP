@@ -34,7 +34,8 @@ options = Options()
 # options.add_argument('--headless')
 options.add_argument('--hide-scrollbars')
 options.add_argument('--disable-gpu')
-options.add_argument('lang=en')
+# options.add_argument('--lang=en')
+options.set_preference('intl.accept_languages', 'en-GB')
 
 # driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
 # driver = webdriver.Firefox(GeckoDriverManager().install(), options=options)
@@ -85,12 +86,12 @@ def extract_age(popup_text):
 
 
 def extract_gender(popup_text):
-    regex = r"(man|woman)"
+    regex = r"(\b[m|M]an\b|\b[w|W]oman\b)"
     return regex_match(regex, popup_text)
 
 
 def extract_location(popup_text):
-    regex = r"from (.*)"
+    regex = r"[f|F]rom (.*)"
     return regex_match(regex, popup_text)
 
 
@@ -128,7 +129,8 @@ def check_cookie_popup():
             EC.element_to_be_clickable((By.CLASS_NAME, "evidon-banner-acceptbutton")))
         ActionChains(driver).move_to_element(element_privacy).click().perform()
     except:
-        print("\nNo cookie pop-up!")
+        # print("\nNo cookie pop-up!")
+        print()
 
 
 def get_user_profile_by_url(url):
@@ -170,16 +172,50 @@ def get_user_profile_by_url(url):
     driver.get(review_summary)
     time.sleep(2)
 
+    # check if date overlay exists
+    if check_exists_by_xpath("//div[@class='rsdc-wrapper corgi rsdc-dual-month']"):
+        try:
+            popup_element_link = WebDriverWait(driver, 5).until(
+                EC.element_to_be_clickable((By.CLASS_NAME, "featured-review-container")))
+            driver.execute_script("arguments[0].scrollIntoView();", popup_element_link)
+            ActionChains(driver).move_to_element(popup_element_link).click().perform()
+            time.sleep(1)
+        except:
+            print()
+
+
     # scroll the viewpoint to the review and open up the pop-up window
-    popup_element_link = WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.CLASS_NAME, "expand_inline.scrname")))
-    driver.execute_script("arguments[0].scrollIntoView();", popup_element_link)
-    ActionChains(driver).move_to_element(popup_element_link).click().perform()
-    time.sleep(1)
+    if check_exists_by_xpath("//span[@class='expand_inline scrname']"):
+        popup_element_link = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.CLASS_NAME, "expand_inline.scrname")))
+        driver.execute_script("arguments[0].scrollIntoView();", popup_element_link)
+        ActionChains(driver).move_to_element(popup_element_link).click().perform()
+        time.sleep(1)
+    elif check_exists_by_xpath("//div[@class='memberOverlayLink']"):
+        popup_element_link = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.CLASS_NAME, "memberOverlayLink")))
+        driver.execute_script("arguments[0].scrollIntoView();", popup_element_link)
+        ActionChains(driver).move_to_element(popup_element_link).click().perform()
+        time.sleep(1)
+    elif check_exists_by_xpath("//div[@class='info_text']"):
+        popup_element_link = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.CLASS_NAME, "info_text")))
+        driver.execute_script("arguments[0].scrollIntoView();", popup_element_link)
+        ActionChains(driver).move_to_element(popup_element_link).click().perform()
+        time.sleep(1)
 
     # move the mouse to the pop-up to stay open
-    popup_element = driver.find_elements_by_xpath("//div[@class='memberOverlayRedesign g10n']")[0]
-    ActionChains(driver).move_to_element(popup_element).perform()
+    try:
+        popup_element = driver.find_elements_by_xpath("//div[@class='memberOverlayRedesign g10n']")[0]
+        ActionChains(driver).move_to_element(popup_element).perform()
+    except:
+        try:
+            popup_element = driver.find_elements_by_xpath("//div[@class='memberOverlayRedesign g10n']")
+            ActionChains(driver).move_to_element(popup_element).perform()
+        except:
+            popup_element = driver.find_elements_by_xpath("//span[@class='ui_overlay ui_popover arrow_left ']")
+            ActionChains(driver).move_to_element(popup_element).perform()
+            print()
     time.sleep(1)
 
     # Get the pop-up content
@@ -189,10 +225,11 @@ def get_user_profile_by_url(url):
             popup_text = popup_element.text
             tags = get_tags()
             gender, age, location, member_since, cities_visited, contributions = extract_popup_info(popup_text)
+            print("\nPop-up Text: " + popup_text)
             print("\nGender: " + gender + " - Age: " + age + " - Location: " + location
                   + " - Member Since: " + member_since + " - Cities: " + cities_visited + " - Contributions: "
                   + contributions)
-            return [gender, age, location, member_since, cities_visited, contributions, tags]
+            return [gender, age, location, member_since, cities_visited, contributions, tags, popup_text]
         except Exception as e:
             print("Problem with extracting data from pop-up window for user " + url + ": " + str(e))
     else:
@@ -215,7 +252,7 @@ def get_all_user_demographics():
     # Reads all user profiles' URLs from the users who have reviewed fishing tourism businesses
     URLs = read_comments_from_files()['reviewer_profile']
 
-    columns = ["url", "gender", "age", "location", "member_since", "cities_visited", "contributions"]
+    columns = ["url", "gender", "age", "location", "member_since", "cities_visited", "contributions", "popup_text"]
 
     # create output directory if it doesn't exist
     directory_name = "output_demographics"
@@ -230,11 +267,11 @@ def get_all_user_demographics():
                 continue
 
             # Get user's data
-            driver.set_page_load_timeout(8)
+            driver.set_page_load_timeout(15)
             demographics_list = get_user_profile_by_url(url)
 
             # Save user's data
-            with open(filename, 'a') as userfile:
+            with open(filename, 'a', encoding='utf-8') as userfile:
                 userfile.write(','.join(columns))  # write column names
                 userfile.write('\n')
                 userfile.write(','.join(str(v) for v in demographics_list))  # write demographics to file

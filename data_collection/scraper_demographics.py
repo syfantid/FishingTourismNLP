@@ -258,7 +258,7 @@ def get_all_user_demographics():
     directory_name = "output_demographics"
     make_directory(directory_name)
 
-    for url in tqdm(URLs):  # correct order
+    for url in tqdm(URLs[1018:]):  # correct order
         try:
             # Check if file already exists
             filename = os.path.join(directory_name, get_username_from_url(url))

@@ -40,8 +40,14 @@ options.set_preference('intl.accept_languages', 'en-GB')
 # driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
 # driver = webdriver.Firefox(GeckoDriverManager().install(), options=options)
 
-driver = Firefox(executable_path="C:\\Users\\Sofia\\Downloads\\geckodriver-v0.28.0-win64\\geckodriver.exe",
-                 firefox_options=options)
+# driver = Firefox(executable_path="C:\\Users\\Sofia\\Downloads\\geckodriver-v0.28.0-win64\\geckodriver.exe",
+#                  firefox_options=options)
+
+#to run on mac
+
+from selenium import webdriver
+driver = webdriver.Chrome(executable_path='/usr/local/bin/chromedriver')
+
 
 # import the webdriver, chrome driver is recommended
 driver.set_page_load_timeout(2)

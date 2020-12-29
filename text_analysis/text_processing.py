@@ -8,6 +8,7 @@ from text_analysis.read_comments import read_comments_from_files
 from nltk.tokenize import word_tokenize, RegexpTokenizer
 from nltk.stem import WordNetLemmatizer
 from nltk.stem import PorterStemmer
+from nltk.stem.snowball import SnowballStemmer
 
 from wordcloud import WordCloud
 from nltk import FreqDist
@@ -17,6 +18,8 @@ from operator import itemgetter
 from sklearn.decomposition import LatentDirichletAllocation as LDA
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
+
+from sklearn.cluster import KMeans
 
 import pyLDAvis
 import pyLDAvis.gensim
@@ -32,6 +35,7 @@ def text_cleaning(text):
     text = ''.join([i for i in text if not i.isdigit()])  # remove digits
     text = ' '.join(x for x in text.split() if x not in stop)  # remove stopwords
     #text = text.replace('[^\w\s#@/:%.,_-]', '', flags=re.UNICODE)  # remove unicodes and emojis
+    text = re.sub(r'(.)\1+', r'\1\1', text)
     unis_emojis_pattern = re.compile(pattern="["
                                         u"\U0001F600-\U0001F64F"  # emoticons
                                         u"\U0001F300-\U0001F5FF"  # symbols & pictographs
@@ -42,19 +46,27 @@ def text_cleaning(text):
     text = re.sub(r'[^\w\s]',' ',text) # remove punctuations
     return text
 
-def text_token(text):
+def tokenize(text):
     words = word_tokenize(text)
     return words
 
+def tokenize_and_stem(text):
+    #first tokenize
+    tokens = [word for word in nltk.word_tokenize(text)]
+    #stemming
+    stemmer = SnowballStemmer("english")
+    stems = [stemmer.stem(t) for t in tokens]
+    return stems
 
-def text_lem(text):
+
+def tokenize_and_lemma(text):
+    # first tokenize
+    tokens = [word for word in nltk.word_tokenize(text)]
+    # lemmatization
     lemmatizer = WordNetLemmatizer()
-    return [lemmatizer.lemmatize(w) for w in text]
+    lemmas =  [lemmatizer.lemmatize(w) for w in tokens]
+    return lemmas
 
-
-def text_stem(text):
-    stemmer = PorterStemmer()
-    return [stemmer.stem(word) for word in text]
 
 def dummy_fun(doc):
     """ dummy function required for ngrams and tfidf tokenizer"""
@@ -71,9 +83,12 @@ def ngrams(words, l1, l2):
     ngrams = cv.fit_transform(words)
     return ngrams, cv
 
-def tfidf(words):
-    vect = TfidfVectorizer(analyzer='word',tokenizer=dummy_fun,preprocessor=dummy_fun,token_pattern=None, max_df=1.0, min_df=1)
-    tfidf = vect.fit_transform(words)
+
+def tfidf(text):
+    vect = TfidfVectorizer(max_df=0.8, max_features=200000,
+                                       min_df=0.2, stop_words='english',
+                                       use_idf=True, tokenizer=tokenize_and_stem, ngram_range=(1, 2))
+    tfidf = vect.fit_transform(text)
     return tfidf, vect
 
 
@@ -120,6 +135,46 @@ def word_frequencies_graph(text):
     rslt = pd.DataFrame(word_dist.most_common(20), columns=['Word', 'Frequency']).set_index('Word')
     fig = rslt.plot.bar(rot=45).get_figure()
     fig.savefig('word_frequencies_bar.png')
+
+
+def kmeans_topics(number_of_clusters, tfidf, df):
+
+    #fitting kmeans
+    num_clusters = number_of_clusters
+    km = KMeans(n_clusters=num_clusters)
+    km.fit(tfidf)
+
+    #assign cluster number to each doc
+    clusters = km.labels_.tolist()
+    df['cluster'] = clusters
+    #df['cluster'].value_counts()
+
+    #creating a df from vocabulary
+    totalvocab_stemmed = []
+    totalvocab_tokenized = []
+    for i in df['text_p']:
+        allwords_stemmed = tokenize_and_stem(i)  # for each item in 'synopses', tokenize/stem
+        totalvocab_stemmed.extend(allwords_stemmed)  # extend the 'totalvocab_stemmed' list
+        allwords_tokenized = tokenize(i)
+        totalvocab_tokenized.extend(allwords_tokenized)
+
+    vocab_frame = pd.DataFrame({'words': totalvocab_tokenized}, index=totalvocab_stemmed)
+
+    #print the clusters and top words per cluster
+    print("Top terms per cluster:")
+    print()
+    # sort cluster centers by proximity to centroid
+    order_centroids = km.cluster_centers_.argsort()[:, ::-1]
+    for i in range(num_clusters):
+        print("Cluster %d words:" % i, end='')
+        for ind in order_centroids[i, :6]:  # replace 6 with n words per cluster
+            print(' %s' % vocab_frame.loc[terms[ind].split(' ')].values.tolist()[0][0].encode('utf-8', 'ignore'),
+                  end=',')
+        print()  # add whitespace
+        print()  # add whitespace
+
+    return km, vocab_frame, df
+
 
 
 def lda_topics(text, number_of_topics, number_words):
@@ -219,18 +274,20 @@ def lda_topics(text, number_of_topics, number_words):
 
 # df = read_comments_from_files()
 # df['text_p'] = df['text'].apply(lambda x: text_cleaning(x))
-# df['text_w'] = df['text_p'].apply(lambda x: text_token(x))
-# df['text_l'] = df['text_w'].apply(lambda x: text_lem(x))
-# df['text_s'] = df['text_w'].apply(lambda x: text_stem(x))
+# df['text_w'] = df['text_p'].apply(lambda x: tokenize(x))
+# df['text_l'] = df['text_p'].apply(lambda x: tokenize_and_lemma(x))
+# df['text_s'] = df['text_p'].apply(lambda x: tokenize_and_stem(x))
 # df['title_p'] = df['title'].apply(lambda x: text_cleaning(x))
-# df['title_w'] = df['title_p'].apply(lambda x: text_token(x))
-# df['title_l'] = df['title_w'].apply(lambda x: text_lem(x))
+# df['title_w'] = df['title_p'].apply(lambda x: tokenize(x))
+# df['title_l'] = df['title_p'].apply(lambda x: tokenize_and_lemma(x))
+# df['title_s'] = df['text_p'].apply(lambda x: tokenize_and_stem(x))
 
 # Ngram and tfidf Vectors
 # ngrams, ngram_voc = ngrams(df['text_l'], 2, 4) #returns bigrams and trigrams
-# tfidf, tfidf_voc = tfidf(df['text_l'])
+# tfidf, tfidf_voc = tfidf(df['text_p']) #returns unigrams
 
 # # topics extraction
+# # with LDA
 # number_of_topics = _INSERT_
 # number_words = _INSERT_
 #
@@ -240,6 +297,9 @@ def lda_topics(text, number_of_topics, number_words):
 # vis = pyLDAvis.gensim.prepare(lda, count_data, vocab)
 # vis
 
+# # with kmeans
+# number_of_clusters = _INSERT_
+# km, vocab_frame, df = kmeans_topics(number_of_clusters, tfidf, df)
 
 # Vizualization and stats - word clouds, word bars etc
 # word_cloud(df['text_p'])

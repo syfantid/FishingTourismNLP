@@ -14,14 +14,16 @@ from bs4 import BeautifulSoup
 import requests
 
 # File paths
-INPUT_PATH = os.path.join(os.getcwd(), os.path.join("data_collection", "input"))
-OUTPUT_PATH = os.path.join(os.getcwd(), os.path.join("data_collection", "output_reviews"))
+# INPUT_PATH = os.path.join(os.getcwd(), os.path.join("data_collection", "input"))
+INPUT_PATH = os.path.join(os.getcwd(), "input")
+OUTPUT_PATH = os.path.join(os.getcwd(), "output_reviews_new")
 # Scraping classes
 PAGE_CLASS = "ui_pagination"
 NEXT_BUTTON_CLASS = "ui_button nav next primary"
 REVIEW_CLASS = "Dq9MAugU T870kzTX LnVzGwUB"
 REVIEW_TITLE_CLASS = "glasR4aX"
 REVIEW_TEXT_CLASS = "cPQsENeY"
+REVIEW_EXPANDED_TEXT_CLASS = "prw_rup prw_reviews_resp_sur_review_text_expanded"
 REVIEW_DATE_CLASS = "_34Xs-BQm"
 REVIEW_RATING_CLASS = "ui_bubble_rating"
 REVIEW_RATING_1_CLASS = "ui_bubble_rating bubble_10"
@@ -29,6 +31,7 @@ REVIEW_RATING_2_CLASS = "ui_bubble_rating bubble_20"
 REVIEW_RATING_3_CLASS = "ui_bubble_rating bubble_30"
 REVIEW_RATING_4_CLASS = "ui_bubble_rating bubble_40"
 REVIEW_RATING_5_CLASS = "ui_bubble_rating bubble_50"
+REVIEW_LINK_CLASS = "ocfR3SKN"
 
 
 def read_page_urls(input_filename):
@@ -113,8 +116,20 @@ def get_review_text(full_review):
     :param full_review: The review's div in HTML-Beautiful Soup format
     :return: \the review's text
     """
-    text_div = full_review.find_all("div", class_=REVIEW_TEXT_CLASS)[0]
-    text = text_div.get_text()
+    review_link = full_review.find_all("a", class_=REVIEW_LINK_CLASS)[0].attrs['href']
+    review_link = urllib.parse.urljoin("https://www.tripadvisor.com", review_link)
+    headers = {'User-Agent': 'Mozilla/5.0'}
+    response = requests.get(review_link, headers=headers)
+
+    if response.status_code == 200:
+        html = response.text
+        # Convert to Beautiful Soup object
+        soup = BeautifulSoup(html, 'html.parser')
+        text = soup.find("div", class_=REVIEW_EXPANDED_TEXT_CLASS).text
+    else:
+        text = ""
+        # Convert the response HTLM string into a python string
+
     return text
 
 
@@ -200,7 +215,9 @@ def scrape_enterprises(input_filename):
     :return: None
     """
     enterprise_names, urls = read_page_urls(input_filename)
-    for enterprise_name, url in zip(enterprise_names[30:], urls[30:]):
-        if not math.isnan(url):
+    for enterprise_name, url in zip(enterprise_names, urls):
+        if not pd.isnull(url):
             scrape_enterprise(enterprise_name.strip(" ") + ".csv", url)
             time.sleep(1)
+
+scrape_enterprises("Fishing_Vessels_FT_f.xls")

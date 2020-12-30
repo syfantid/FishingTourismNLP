@@ -31,7 +31,7 @@ from data_collection.scraper_businesses import write_to_file
 from data_collection.scraper_user_badges import get_username_from_url
 
 options = Options()
-# options.add_argument('--headless')
+options.add_argument('--headless')
 options.add_argument('--hide-scrollbars')
 options.add_argument('--disable-gpu')
 # options.add_argument('--lang=en')
@@ -48,6 +48,36 @@ driver.set_page_load_timeout(2)
 filename = ""
 i = 0
 
+def correct_file_format():
+    newline = os.linesep  # Defines the newline based on your OS.
+
+    input_path = 'data_collection\\output_demographics'
+    output_path = 'data_collection\\output_demographics_new'
+    ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # This is your Project Root
+    absolute_input_path = os.path.join(ROOT_DIR, input_path)
+    absolute_output_path = os.path.join(ROOT_DIR, output_path)
+    make_directory(absolute_output_path)
+
+    for filename in os.listdir(absolute_input_path):
+        source_fp = open(os.path.join(absolute_input_path, filename), 'r', encoding='utf-8')
+        new_filename = filename + '.csv'
+        target_fp = open(os.path.join(absolute_output_path, new_filename), 'w', encoding='utf-8')
+        first_row = True
+        for row in source_fp:
+            if first_row:
+                row = 'gender,age,location,member_since,cities_visited,contributions,tags,popup_text'
+                first_row = False
+                target_fp.write(row + '\n')
+            else:
+                row = row.replace('\n',' ')
+                row = row.replace(', ', '-')
+                target_fp.write(row)
+        source_fp.close()
+        target_fp.close()
+
+        # with open(os.path.join(absolute_input_path, filename), 'r') as f:  # open in readonly mode
+        #     print()
+    # do your stuff
 
 def check_exists_by_xpath(xpath):
     """
@@ -92,7 +122,7 @@ def extract_gender(popup_text):
 
 def extract_location(popup_text):
     regex = r"[f|F]rom (.*)"
-    return regex_match(regex, popup_text)
+    return regex_match(regex, popup_text).replace(', ','-')
 
 
 def extract_cities_visited(popup_text):
@@ -252,7 +282,7 @@ def get_all_user_demographics():
     # Reads all user profiles' URLs from the users who have reviewed fishing tourism businesses
     URLs = read_comments_from_files()['reviewer_profile']
 
-    columns = ["url", "gender", "age", "location", "member_since", "cities_visited", "contributions", "popup_text"]
+    columns = ["gender", "age", "location", "member_since", "cities_visited", "contributions", "tags", "popup_text"]
 
     # create output directory if it doesn't exist
     directory_name = "output_demographics"
@@ -262,6 +292,7 @@ def get_all_user_demographics():
         try:
             # Check if file already exists
             filename = os.path.join(directory_name, get_username_from_url(url))
+            filename += ".csv"
             if os.path.isfile(filename):  # check if user's profile has been already parsed
                 print("\nUser's profile is already parsed in " + filename)
                 continue
@@ -281,3 +312,5 @@ def get_all_user_demographics():
 
     print('\nProgram is complete.')
     driver.close()
+
+correct_file_format()

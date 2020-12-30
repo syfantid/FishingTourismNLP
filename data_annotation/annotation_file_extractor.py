@@ -1,10 +1,13 @@
 import errno
 import os
+from os import listdir
 
 import pandas as pd
 from pathlib import Path
 
-INPUT_PATH = 'data_collection\\output_reviews'
+from tqdm import tqdm
+
+INPUT_PATH = 'data_collection\\output_demographics_new'
 
 def read_comments_from_files():
     ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # This is your Project Root
@@ -13,9 +16,10 @@ def read_comments_from_files():
     df = pd.DataFrame()
 
     path_list = Path(absolute_input_path).rglob('*.csv')
-    for path in path_list:
-        path_str = str(path) # because path is object not string
-        file_df = pd.read_csv(path_str, index_col=0)
+    for path in tqdm(path_list):
+        path_str = str(path)  # because path is object not string
+        # file_df = pd.read_csv(path_str, index_col=0)
+        file_df = pd.read_csv(path_str)
         if len(df) != 0:
             df = pd.concat([df, file_df])
         else:
@@ -47,7 +51,8 @@ def create_annotation_files(df_sample, examples_number, annotators_number):
 
 def get_annotation_files():
     df = read_comments_from_files()
-    df_sample = get_df_subset(df, 200)
-    create_annotation_files(df_sample, 60, 5)
+    print(df.count())
+    # df_sample = get_df_subset(df, 200)
+    # create_annotation_files(df_sample, 60, 5)
 
 get_annotation_files()

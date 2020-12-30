@@ -20,10 +20,12 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_samples, silhouette_score
+
 
 import pyLDAvis
 import pyLDAvis.gensim
-
+import matplotlib.pyplot as plt
 
 
 def text_cleaning(text):
@@ -298,12 +300,42 @@ def lda_topics(text, number_of_topics, number_words):
 # vis
 
 # # with kmeans
-# number_of_clusters = _INSERT_
+# # defining the best k -- elbow method
+# sum_of_squared_distances = []
+# K = range(2,10)
+# for k in K:
+#     km, vocab_frame, df = kmeans_topics(k, tfidf, df)
+#     sum_of_squared_distances.append(km.inertia_)
+#
+# # plot the distances
+# plt.plot(K, sum_of_squared_distances, 'bx-')
+# plt.xlabel('k')
+# plt.ylabel('Sum_of_squared_distances')
+# plt.title('Elbow Method For Optimal k')
+# plt.show()
+
+# # defining the best k -- silhpuette score
+# sil = []
+# K = range(2,10)
+#
+# # dissimilarity would not be defined for a single cluster, thus, minimum number of clusters should be 2
+# for k in K:
+#   km, vocab_frame, df = kmeans_topics(k, tfidf, df)
+#   labels = km.labels_
+#   sil.append(silhouette_score(tfidf, labels, metric = 'euclidean'))
+#
+# # plot the distances
+# plt.plot(K, sil, 'bx-')
+# plt.xlabel('k')
+# plt.ylabel('Silhouette score')
+# plt.title('Silhouette score For Optimal k')
+# plt.show()
+
+# number_of_clusters = _INSERT_OPTIMAL_
 # km, vocab_frame, df = kmeans_topics(number_of_clusters, tfidf, df)
 
 # Vizualization and stats - word clouds, word bars etc
 # word_cloud(df['text_p'])
 # ngrams_cloud(df['text_p'])
 # word_frequencies_graph(df['text_p'])
-
 

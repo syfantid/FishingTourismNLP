@@ -207,6 +207,7 @@ def word_frequencies_graph(text, output_filepath):
 
 def kmeans_topics(number_of_clusters, tfidf, df):
     # fitting kmeans
+    print("Running k-means with K = " + str(number_of_clusters))
     num_clusters = number_of_clusters
     km = KMeans(n_clusters=num_clusters)
     km.fit(tfidf)
@@ -228,17 +229,18 @@ def kmeans_topics(number_of_clusters, tfidf, df):
     vocab_frame = pd.DataFrame({'words': totalvocab_tokenized}, index=totalvocab_stemmed)
 
     # print the clusters and top words per cluster
-    print("Top terms per cluster:")
-    print()
+    # print("Top terms per cluster:")
+    # print()
     # sort cluster centers by proximity to centroid
     order_centroids = km.cluster_centers_.argsort()[:, ::-1]
-    for i in range(num_clusters):
-        print("Cluster %d words:" % i, end='')
-        for ind in order_centroids[i, :6]:  # replace 6 with n words per cluster
-            print(' %s' % vocab_frame.loc[terms[ind].split(' ')].values.tolist()[0][0].encode('utf-8', 'ignore'),
-                  end=',')
-        print()  # add whitespace
-        print()  # add whitespace
+    # todo: Fix bug; cannot run with variable terms (unresolved)
+    # for i in range(num_clusters):
+    #     print("Cluster %d words:" % i, end='')
+    #     for ind in order_centroids[i, :6]:  # replace 6 with n words per cluster
+    #         print(' %s' % vocab_frame.loc[terms[ind].split(' ')].values.tolist()[0][0].encode('utf-8', 'ignore'),
+    #               end=',')
+    #     print()  # add whitespace
+    #     print()  # add whitespace
 
     return km, vocab_frame, df
 
@@ -326,6 +328,41 @@ def lda_topics(text, output_filepath):  # text-tokens
     return topics
 
 
+def find_optimal_k_silhouette(df, tfidf, from_k=2, to_k=10):
+    # defining the best k -- silhpuette score
+    sil = []
+    K = range(from_k, to_k)
+
+    # dissimilarity would not be defined for a single cluster, thus, minimum number of clusters should be 2
+    for k in K:
+        km, vocab_frame, df = kmeans_topics(k, tfidf, df)
+        labels = km.labels_
+        sil.append(silhouette_score(tfidf, labels, metric='euclidean'))
+
+    # plot the distances
+    plt.plot(K, sil, 'bx-')
+    plt.xlabel('k')
+    plt.ylabel('Silhouette score')
+    plt.title('Silhouette score For Optimal k')
+    # plt.show()
+    plt.savefig(os.path.join(output_filepath, 'silhouette.png'), dpi=600)
+
+
+def find_optimal_k_elbow(df, tfidf, from_k=2, to_k=10):
+    sum_of_squared_distances = []
+    K = range(from_k, to_k)
+    for k in K:
+        km, vocab_frame, df = kmeans_topics(k, tfidf, df)
+        sum_of_squared_distances.append(km.inertia_)
+
+    # plot the distances
+    plt.plot(K, sum_of_squared_distances, 'bx-')
+    plt.xlabel('k')
+    plt.ylabel('Sum_of_squared_distances')
+    plt.title('Elbow Method For Optimal k')
+    plt.savefig(os.path.join(output_filepath, 'elbow.png'), dpi=600)
+
+
 def setup_variables():
     if user_profile_analysis:
         filepath = 'data_collection\\output_profiles'
@@ -380,6 +417,9 @@ if __name__ == '__main__':
     tfidf, tfidf_voc = tfidf(df['text_p'])  # returns unigrams
 
     # topics extraction
+    # Identifying the optimal number of clusters
+    print("Identifying the optimal number of clusters...")
+    find_optimal_k_silhouette(df, tfidf, from_k=2, to_k=20)
 
     # with LDA (w/o Gensim)
     # number_of_topics = _INSERT_
@@ -396,36 +436,6 @@ if __name__ == '__main__':
 
     # # with kmeans
     # # defining the best k -- elbow method
-    # sum_of_squared_distances = []
-    # K = range(2,10)
-    # for k in K:
-    #     km, vocab_frame, df = kmeans_topics(k, tfidf, df)
-    #     sum_of_squared_distances.append(km.inertia_)
-    #
-    # # plot the distances
-    # plt.plot(K, sum_of_squared_distances, 'bx-')
-    # plt.xlabel('k')
-    # plt.ylabel('Sum_of_squared_distances')
-    # plt.title('Elbow Method For Optimal k')
-    # plt.show()
-
-    # # defining the best k -- silhpuette score
-    # sil = []
-    # K = range(2,10)
-    #
-    # # dissimilarity would not be defined for a single cluster, thus, minimum number of clusters should be 2
-    # for k in K:
-    #   km, vocab_frame, df = kmeans_topics(k, tfidf, df)
-    #   labels = km.labels_
-    #   sil.append(silhouette_score(tfidf, labels, metric = 'euclidean'))
-    #
-    # # plot the distances
-    # plt.plot(K, sil, 'bx-')
-    # plt.xlabel('k')
-    # plt.ylabel('Silhouette score')
-    # plt.title('Silhouette score For Optimal k')
-    # plt.show()
-
     # number_of_clusters = _INSERT_OPTIMAL_
     # km, vocab_frame, df = kmeans_topics(number_of_clusters, tfidf, df)
 

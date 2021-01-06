@@ -381,7 +381,7 @@ def setup_variables():
 
 if __name__ == '__main__':
     filepath, text_column, title_column, output_filepath = setup_variables()
-    df = read_comments_from_files(input=filepath)
+    df = read_comments_from_files(input=filepath, user_profiles=user_profile_analysis)
 
     # Filter out entries without text (comment field is nan)
     print('Filtering out empty-text reviews..')
@@ -419,7 +419,7 @@ if __name__ == '__main__':
     # topics extraction
     # Identifying the optimal number of clusters
     print("Identifying the optimal number of clusters...")
-    find_optimal_k_silhouette(df, tfidf, from_k=2, to_k=20)
+    # find_optimal_k_silhouette(df, tfidf, from_k=2, to_k=20)
 
     # with LDA (w/o Gensim)
     # number_of_topics = _INSERT_
@@ -443,3 +443,5 @@ if __name__ == '__main__':
     word_cloud(df['text_p'], output_filepath)
     ngrams_cloud(df['text_p'], output_filepath)
     word_frequencies_graph(df['text_p'], output_filepath)
+
+    df.to_csv(os.path.join(output_filepath,'processed_dataframe.csv'))

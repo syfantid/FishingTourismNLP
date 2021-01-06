@@ -54,6 +54,7 @@ driver.set_page_load_timeout(2)
 filename = ""
 i = 0
 
+
 def correct_file_format():
     newline = os.linesep  # Defines the newline based on your OS.
 
@@ -75,7 +76,7 @@ def correct_file_format():
                 first_row = False
                 target_fp.write(row + '\n')
             else:
-                row = row.replace('\n',' ')
+                row = row.replace('\n', ' ')
                 row = row.replace(', ', '-')
                 target_fp.write(row)
         source_fp.close()
@@ -84,6 +85,7 @@ def correct_file_format():
         # with open(os.path.join(absolute_input_path, filename), 'r') as f:  # open in readonly mode
         #     print()
     # do your stuff
+
 
 def check_exists_by_xpath(xpath):
     """
@@ -128,7 +130,7 @@ def extract_gender(popup_text):
 
 def extract_location(popup_text):
     regex = r"[f|F]rom (.*)"
-    return regex_match(regex, popup_text).replace(', ','-')
+    return regex_match(regex, popup_text).replace(', ', '-')
 
 
 def extract_cities_visited(popup_text):
@@ -219,7 +221,6 @@ def get_user_profile_by_url(url):
         except:
             print()
 
-
     # scroll the viewpoint to the review and open up the pop-up window
     if check_exists_by_xpath("//span[@class='expand_inline scrname']"):
         popup_element_link = WebDriverWait(driver, 10).until(
@@ -235,7 +236,7 @@ def get_user_profile_by_url(url):
         time.sleep(1)
     elif check_exists_by_xpath("//div[@class='info_text']"):
         popup_element_link = WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.CLASS_NAME, "info_text")))
+            EC.element_to_be_clickable((By.CLASS_NAME, "info_text")))
         driver.execute_script("arguments[0].scrollIntoView();", popup_element_link)
         ActionChains(driver).move_to_element(popup_element_link).click().perform()
         time.sleep(1)

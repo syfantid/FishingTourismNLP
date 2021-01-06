@@ -5,6 +5,8 @@ import pandas as pd
 from pathlib import Path
 
 INPUT_PATH = 'data_collection\\output_reviews_new'
+
+
 # for mac
 # INPUT_PATH = 'FishingTourismNLP/data_collection/output_reviews'
 
@@ -16,7 +18,7 @@ def read_comments_from_files():
 
     path_list = Path(absolute_input_path).rglob('*.csv')
     for path in path_list:
-        path_str = str(path) # because path is object not string
+        path_str = str(path)  # because path is object not string
         file_df = pd.read_csv(path_str, index_col=0)
         if len(df) != 0:
             df = pd.concat([df, file_df])
@@ -51,5 +53,6 @@ def get_annotation_files():
     df = read_comments_from_files()
     df_sample = get_df_subset(df, 200)
     create_annotation_files(df_sample, 60, 5)
+
 
 get_annotation_files()

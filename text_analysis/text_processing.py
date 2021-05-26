@@ -369,47 +369,52 @@ def setup_variables():
         text_column = 'review_details'
         title_column = 'reviewTitle'
         output_filepath = 'output\\output_user_profiles'
+        processed_filepath = os.path.join(output_filepath, 'processed_dataframe.csv')
     else:
         filepath = 'data_collection\\output_reviews'
         text_column = 'text'
         title_column = 'title'
         output_filepath = 'output\\output_business_profiles'
+        processed_filepath = os.path.join(output_filepath, 'processed_dataframe.csv')
     if not os.path.exists(output_filepath):
         os.makedirs(output_filepath)
-    return filepath, text_column, title_column, output_filepath
+    return filepath, text_column, title_column, output_filepath, processed_filepath
 
 
 if __name__ == '__main__':
-    filepath, text_column, title_column, output_filepath = setup_variables()
-    df = read_comments_from_files(input=filepath, user_profiles=user_profile_analysis)
+    filepath, text_column, title_column, output_filepath, processed_filepath = setup_variables()
+    if os.path.exists(processed_filepath):
+        df = pd.read_csv(processed_filepath)
+    else:
+        df = read_comments_from_files(input=filepath, user_profiles=user_profile_analysis)
 
-    # Filter out entries without text (comment field is nan)
-    print('Filtering out empty-text reviews..')
-    df.dropna(subset=[text_column], inplace=True)
+        # Filter out entries without text (comment field is nan)
+        print('Filtering out empty-text reviews..')
+        df.dropna(subset=[text_column], inplace=True)
 
-    # Text cleaning
-    print("Cleaning text...")
-    df['text_p'] = df[text_column].apply(lambda x: text_cleaning(x))  # for user profiles
+        # Text cleaning
+        print("Cleaning text...")
+        df['text_p'] = df[text_column].apply(lambda x: text_cleaning(x))  # for user profiles
 
-    # Filter out non-English entries
-    print('Filtering out non-English reviews...')
-    df = df[df['text_p'].map(lambda x: is_english(x))]
+        # Filter out non-English entries
+        print('Filtering out non-English reviews...')
+        df = df[df['text_p'].map(lambda x: is_english(x))]
 
-    # Replacing names and tour locations
-    print("Replacing owner and crew's names and tour locations...")
-    df['text_p'] = df['text_p'].apply(lambda x: replace_owner_names(x))
-    df['text_p'] = df['text_p'].apply(lambda x: replace_locations(x))
+        # Replacing names and tour locations
+        print("Replacing owner and crew's names and tour locations...")
+        df['text_p'] = df['text_p'].apply(lambda x: replace_owner_names(x))
+        df['text_p'] = df['text_p'].apply(lambda x: replace_locations(x))
 
-    # Tokenization, Lemmatization and Stemming
-    print("Tokenization, Lemmatization and Stemming...")
-    df['text_w'] = df['text_p'].apply(lambda x: tokenize(x))
-    df['text_l'] = df['text_p'].apply(lambda x: tokenize_and_lemma(x))
-    df['text_s'] = df['text_p'].apply(lambda x: tokenize_and_stem(x))
-    # df['title_p'] = df['title'].apply(lambda x: text_cleaning(x))  # for business reviews
-    df['title_p'] = df[title_column].apply(lambda x: text_cleaning(x))  # for user profiles
-    df['title_w'] = df['title_p'].apply(lambda x: tokenize(x))
-    df['title_l'] = df['title_p'].apply(lambda x: tokenize_and_lemma(x))
-    df['title_s'] = df['text_p'].apply(lambda x: tokenize_and_stem(x))
+        # Tokenization, Lemmatization and Stemming
+        print("Tokenization, Lemmatization and Stemming...")
+        df['text_w'] = df['text_p'].apply(lambda x: tokenize(x))
+        df['text_l'] = df['text_p'].apply(lambda x: tokenize_and_lemma(x))
+        df['text_s'] = df['text_p'].apply(lambda x: tokenize_and_stem(x))
+        # df['title_p'] = df['title'].apply(lambda x: text_cleaning(x))  # for business reviews
+        df['title_p'] = df[title_column].apply(lambda x: text_cleaning(x))  # for user profiles
+        df['title_w'] = df['title_p'].apply(lambda x: tokenize(x))
+        df['title_l'] = df['title_p'].apply(lambda x: tokenize_and_lemma(x))
+        df['title_s'] = df['text_p'].apply(lambda x: tokenize_and_stem(x))
 
     # Ngram and tfidf Vectors
     print("N-grams and TF-IDF Vectors...")
@@ -418,7 +423,7 @@ if __name__ == '__main__':
 
     # topics extraction
     # Identifying the optimal number of clusters
-    print("Identifying the optimal number of clusters...")
+    # print("Identifying the optimal number of clusters...")
     # find_optimal_k_silhouette(df, tfidf, from_k=2, to_k=20)
 
     # with LDA (w/o Gensim)

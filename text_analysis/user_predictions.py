@@ -16,10 +16,11 @@ from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import make_pipeline, Pipeline
 import matplotlib.pyplot as plt
+from sklearn.preprocessing import OneHotEncoder
 
 from text_analysis.read_comments import read_comments_from_files
 
-from spellchecker import SpellChecker
+from spellchecker import Spellchecker
 from nltk import pos_tag
 from nltk.corpus import names
 from nltk import sent_tokenize
@@ -30,10 +31,10 @@ from text_analysis.sentiment_analysis import get_review_sentiment
 from imblearn.over_sampling import SMOTE
 
 
-INPUT_PATH = 'output\\output_user_profiles'
+INPUT_PATH = 'text_analysis\\output\\output_user_profiles'
 INPUT_FILENAME = 'processed_dataframe.csv'
-DEMOGRAPHICS_PATH = 'data_collection\\output_demographics'
-MODELS_PATH = '' #TODO add Sofia
+DEMOGRAPHICS_PATH = 'FishingTourismNLP\\data_collection\\output_demographics'
+MODELS_PATH = 'models'
 
 # For mac
 # INPUT_PATH = 'text_analysis/output/output_user_profiles'
@@ -153,7 +154,7 @@ def gender_prediction(df, classifier='lr'):
 
     # Data to use
     # df = df[['text_p', 'title_p', 'reviewFor', 'reviewRating', 'gender']]
-    X = df['text_p']
+    X = gender_features(df)
     y = df['gender']
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.3, random_state=33)
@@ -261,30 +262,47 @@ def gender_name_training(name):
 
 def gender_features(df):
 
+    df_features = pd.DataFrame()
+
+    #behavioral features
+
     # gender estimation from username
     df['clean_username'] = df['username'].apply(lambda x: clean_username(x)) #clean username
-    gender_clf = pickle.load(open(os.pathconf(MODELS_PATH, 'gender_name_model.sav').sav, 'rb')) # load model
-    df['gender_estimation'] = df['clean_username'].apply(lambda x: gender_clf.classify(name_extract_features(x)))
+    # gender_clf = pickle.load(open(os.pathconf(MODELS_PATH, 'gender_name_model.sav').sav, 'rb')) # load model
+    gender_clf = pickle.load(open('C:\\Users\\Dimitra\\PycharmProjects\\FishingTourismNLP\\models\\gender_name_model.sav', 'rb'))
+    df_features['gender_estimation'] = df['clean_username'].apply(lambda x: gender_clf.classify(name_extract_features(x)))
+
+    #encode nominal variable
+    one_hot = pd.get_dummies(df_features['gender_estimation'])
+    df_features = df_features.drop('gender_estimation', axis=1)
+    df_features  = df_features .join(one_hot)
+
 
     # Sentiment
-    df['text_sentiment'] = df['review_details'].apply(lambda x: get_review_sentiment(x))
+    df_features['text_sentiment'] = df['review_details'].apply(lambda x: get_review_sentiment(x))
 
     # syntax
     df['pos_tag'] = df['text_p'].apply(lambda x: pos_tag(x.split(" ")))
     df['tags'] = df['pos_tag'].apply(lambda x: [pos for word, pos in (x)])
     # # summing to larger POS groups
-    df['Adj'] = df['tags'].apply(lambda x: x.count('JJ') + x.count('JJR') + x.count('JJS'))
-    df['Verb'] = df['tags'].apply(
+    df_features['Adj'] = df['tags'].apply(lambda x: x.count('JJ') + x.count('JJR') + x.count('JJS'))
+    df_features['Verb'] = df['tags'].apply(
         lambda x: x.count('VB') + x.count('VBD') + x.count('VBG') + x.count('VBN') + x.count('VBP') + x.count('VBZ'))
-    df['Noun'] = df['tags'].apply(lambda x: x.count('NN') + x.count('NNS') + x.count('NNP') + x.count('NNPS'))
-    df['Adv'] = df['tags'].apply(lambda x: x.count('RB') + x.count('RBR') + x.count('RBS'))
+    df_features['Noun'] = df['tags'].apply(lambda x: x.count('NN') + x.count('NNS') + x.count('NNP') + x.count('NNPS'))
+    df_features['Adv'] = df['tags'].apply(lambda x: x.count('RB') + x.count('RBR') + x.count('RBS'))
 
     #politeness
 
     # found this https://github.com/ryandavila/new-politeness but doesn't run
 
+    # # text features + beahvioral
+    # v = TfidfVectorizer()
+    # x = v.fit_transform(df['text_s'])
+    # df1 = pd.DataFrame(x.toarray(), columns=v.get_feature_names())
+    # res = pd.concat([df_features, df1], axis=1)
 
-    return df
+
+    return df_features
 
 
 
@@ -332,3 +350,27 @@ if __name__ == '__main__':
     age_prediction(df, classifier='rf')
 
     print()
+
+# v = TfidfVectorizer()
+# x = v.fit_transform(df['text_s'])
+# import scipy as sp
+# X = sp.sparse.hstack((x, df_features), format='csr')
+# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.3, random_state=33)
+# clf_lr = lr.fit(X_train, y_train)
+# y_predicted = clf_lr.predict(X_train)
+# evaluate(y_train, y_predicted, clf_lr, X_train, "Logistic Regression")
+# y_predicted = clf_lr.predict(X_test)
+# evaluate(y_test, y_predicted, clf_lr, X_test, "Logistic Regression")
+# rf = RandomForestClassifier()
+# clf_rf = rf.fit(X_train, y_train)
+# y_predicted = clf_rf.predict(X_train)
+# evaluate(y_train, y_predicted, clf_rf, X_train, "Random Forest")
+# y_predicted = clf_rf.predict(X_test)
+# evaluate(y_test, y_predicted, clf_rf, X_test, "Random Forest")
+# sgd = SGDClassifier()
+# clf_sgd = sgd.fit(X_train, y_train)
+# y_predicted = clf_sgd.predict(X_train)
+# evaluate(y_train, y_predicted, clf_sgd, X_train, "Stochastic Gradient Descent")
+# _predicted = clf_sgd.predict(X_test)
+# evaluate(y_test, y_predicted, clf_sgd, X_test, "Stochastic Gradient Descent")
+#

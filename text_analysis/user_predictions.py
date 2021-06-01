@@ -16,11 +16,12 @@ from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import make_pipeline, Pipeline
 import matplotlib.pyplot as plt
-from sklearn.preprocessing import OneHotEncoder
+from sklearn.preprocessing import OneHotEncoder, LabelEncoder
+
 
 from text_analysis.read_comments import read_comments_from_files
 
-from spellchecker import Spellchecker
+#from spellchecker import Spellchecker
 from nltk import pos_tag
 from nltk.corpus import names
 from nltk import sent_tokenize
@@ -174,9 +175,11 @@ def gender_prediction(df, classifier='lr'):
 
 def age_features(df):
 
+    df_features = pd.DataFrame()
+
     # structure features
-    df['no_char'] = df['review_details'].str.len()  #number of characters
-    df['no_words'] = df['review_details'].str.split().str.len() #number of words
+    df_features['no_char'] = df['review_details'].str.len()  #number of characters
+    df_features['no_words'] = df['review_details'].str.split().str.len() #number of words
 
     def average_words(text):
         counts = []
@@ -186,36 +189,34 @@ def age_features(df):
         words = sum([len(element) for element in counts])
         return float(words)/len(counts)
 
-    df['sentence_words'] = df['review_details'].apply(lambda x: average_words(x)) #avg number of words per sentence
-    df['exclamatories'] = df['review_details'].str.count('!') #number of exclamatories
+    df_features['sentence_words'] = df['review_details'].apply(lambda x: average_words(x)) #avg number of words per sentence
+    df_features['exclamatories'] = df['review_details'].str.count('!') #number of exclamatories
     #df['no_misspelled'] = df['review_details'].str.split().apply(lambda x: len(list(SpellChecker.unknown(x)))) #number of misspelled words
 
     # syntax
     df['pos_tag'] = df['text_p'].apply(lambda x: pos_tag(x.split(" ")))
     df['tags'] = df['pos_tag'].apply(lambda x: [pos for word, pos in (x)])
     # # summing to larger POS groups
-    df['Adj'] = df['tags'].apply(lambda x: x.count('JJ') + x.count('JJR') + x.count('JJS'))
-    df['Verb'] = df['tags'].apply(lambda x: x.count('VB') + x.count('VBD') + x.count('VBG') + x.count('VBN') + x.count('VBP') + x.count('VBZ'))
-    df['Noun'] = df['tags'].apply(lambda x: x.count('NN') + x.count('NNS') + x.count('NNP') + x.count('NNPS'))
-    df['Adv'] = df['tags'].apply(lambda x: x.count('RB') + x.count('RBR') + x.count('RBS'))
+    df_features['Adj'] = df['tags'].apply(lambda x: x.count('JJ') + x.count('JJR') + x.count('JJS'))
+    df_features['Verb'] = df['tags'].apply(lambda x: x.count('VB') + x.count('VBD') + x.count('VBG') + x.count('VBN') + x.count('VBP') + x.count('VBZ'))
+    df_features['Noun'] = df['tags'].apply(lambda x: x.count('NN') + x.count('NNS') + x.count('NNP') + x.count('NNPS'))
+    df_features['Adv'] = df['tags'].apply(lambda x: x.count('RB') + x.count('RBR') + x.count('RBS'))
 
 
     # Readabilty
-    df['flesch_reading_ease'] = df['review_details'].apply(textstat.flesch_reading_ease)
-    df['smog_index'] = df['review_details'].apply(textstat.smog_index)
-    df['flesch_kincaid_grade'] = df['review_details'].apply(textstat.flesch_kincaid_grade)
-    df['coleman_liau_index'] = df['review_details'].apply(textstat.coleman_liau_index)
-    df['automated_readability_index'] = df['review_details'].apply(textstat.automated_readability_index)
-    df['dale_chall_readability_score'] = df['review_details'].apply(textstat.dale_chall_readability_score)
-    df['difficult_words'] = df['review_details'].apply(textstat.difficult_words)
-    df['linsear_write_formula'] = df['review_details'].apply(textstat.linsear_write_formula)
-    df['gunning_fog'] = df['review_details'].apply(textstat.gunning_fog)
-    df['text_standard'] = df['review_details'].apply(textstat.text_standard)
+    df_features['flesch_reading_ease'] = df['review_details'].apply(textstat.flesch_reading_ease)
+    df_features['smog_index'] = df['review_details'].apply(textstat.smog_index)
+    df_features['flesch_kincaid_grade'] = df['review_details'].apply(textstat.flesch_kincaid_grade)
+    df_features['coleman_liau_index'] = df['review_details'].apply(textstat.coleman_liau_index)
+    df_features['automated_readability_index'] = df['review_details'].apply(textstat.automated_readability_index)
+    df_features['dale_chall_readability_score'] = df['review_details'].apply(textstat.dale_chall_readability_score)
+    df_features['difficult_words'] = df['review_details'].apply(textstat.difficult_words)
+    df_features['gunning_fog'] = df['review_details'].apply(textstat.gunning_fog)
 
     # Sentiment
-    df['text_sentiment'] = df['review_details'].apply(lambda x: get_review_sentiment(x))
+    df_features['text_sentiment'] = df['review_details'].apply(lambda x: get_review_sentiment(x))
 
-    return df
+    return df_features
 
 def clean_username(name):
     cleaned = re.sub(r'[?|!|\'|"|#]', r'', name)
@@ -311,18 +312,19 @@ def age_prediction(df, classifier='lr'):
     df.dropna(subset=['age'], inplace=True)
 
     # Data to use
-    X = df['text_p'] #age features extraction
+    X = age_features(df) #age features extraction
     y = df['age']
 
-    # Results without oversampling and only cv - F1 macro
-    # NB: 0.64, LR: 0.66, RF: 0.54
+    y = LabelEncoder().fit_transform(y)
 
-    # using synthetic oversampling technique
-    smote = SMOTE('minority')
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.3, random_state=33, stratify=y)
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.3, random_state=33)
+    strategy = {0:150}
+    oversample = SMOTE(sampling_strategy=strategy)
 
-    X_sm, y_sm = smote.fit(X_train, y_train)
+    X_sm, y_sm = oversample.fit_resample(X_train, y_train)
+
+
 
     if classifier == 'nb':
         nb(X_sm, X_test, y_sm, y_test)
@@ -371,6 +373,6 @@ if __name__ == '__main__':
 # clf_sgd = sgd.fit(X_train, y_train)
 # y_predicted = clf_sgd.predict(X_train)
 # evaluate(y_train, y_predicted, clf_sgd, X_train, "Stochastic Gradient Descent")
-# _predicted = clf_sgd.predict(X_test)
+# y_predicted = clf_sgd.predict(X_test)
 # evaluate(y_test, y_predicted, clf_sgd, X_test, "Stochastic Gradient Descent")
 #

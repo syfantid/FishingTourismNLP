@@ -18,6 +18,8 @@ from sklearn.pipeline import make_pipeline, Pipeline
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import OneHotEncoder, LabelEncoder
 
+import pickle
+import joblib
 
 from text_analysis.read_comments import read_comments_from_files
 
@@ -115,7 +117,7 @@ def lr(X_train, X_test, y_train, y_test):
 def rf(X_train, X_test, y_train, y_test):
     pipeline_rf = Pipeline([
         ('vect', CountVectorizer()),
-        ('lr', RandomForestClassifier())
+        ('rf', RandomForestClassifier())
     ])
 
     clf_rf = pipeline_rf.fit(X_train, y_train)
@@ -150,26 +152,39 @@ def sgd(X_train, X_test, y_train, y_test):
 
 
 def gender_prediction(df, classifier='lr'):
-    df.dropna(subset=['gender'], inplace=True)
-    df = fix_labels(df)
+    # df.dropna(subset=['gender'], inplace=True)
+    # df = fix_labels(df)
 
     # Data to use
     # df = df[['text_p', 'title_p', 'reviewFor', 'reviewRating', 'gender']]
     X = gender_features(df)
-    y = df['gender']
+    #y = df['gender']
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.3, random_state=33)
-    # gender_prediction_nb(X_train, X_test, y_train, y_test)
-    # gender_prediction_lr(X_train, X_test, y_train, y_test)
-    if classifier == 'nb':
-        nb(X_train, X_test, y_train, y_test)
-    elif classifier == 'lr':
-        lr(X_train, X_test, y_train, y_test)
-    elif classifier == 'rf':
-        rf(X_train, X_test, y_train, y_test)
-    else:
-        sgd(X_train, X_test, y_train, y_test)
-    # param_grid = [{'logisticregression__C': [1, 10, 100, 1000]}
+
+    #combine tabular and textual data
+    v = TfidfVectorizer(vocabulary=pickle.load(open("models/gender_text_features.pkl", "rb")))
+    x = v.fit_transform(df['text_s'])
+    import scipy as sp
+    X = sp.sparse.hstack((x, X), format='csr')
+
+    loaded_model = joblib.load('models/gender_model.sav')
+    df['gender'] = loaded_model.predict(X)
+    return df
+
+
+
+    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.3, random_state=33)
+    # # gender_prediction_nb(X_train, X_test, y_train, y_test)
+    # # gender_prediction_lr(X_train, X_test, y_train, y_test)
+    # if classifier == 'nb':
+    #     nb(X_train, X_test, y_train, y_test)
+    # elif classifier == 'lr':
+    #     lr(X_train, X_test, y_train, y_test)
+    # elif classifier == 'rf':
+    #     rf(X_train, X_test, y_train, y_test)
+    # else:
+    #     sgd(X_train, X_test, y_train, y_test)
+    # # param_grid = [{'logisticregression__C': [1, 10, 100, 1000]}
     # gs = GridSearchCV(pipe, param_grid)
     # gs.fit(X, y)
 
@@ -309,47 +324,70 @@ def gender_features(df):
 
 
 def age_prediction(df, classifier='lr'):
-    df.dropna(subset=['age'], inplace=True)
+    # df.dropna(subset=['age'], inplace=True)
 
     # Data to use
     X = age_features(df) #age features extraction
-    y = df['age']
+    # y = df['age']
 
-    y = LabelEncoder().fit_transform(y)
+    # y = LabelEncoder().fit_transform(y)
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.3, random_state=33, stratify=y)
+    # combine tabular and textual data
+    v = TfidfVectorizer(vocabulary=pickle.load(open("models/age_text_features.pkl", "rb")))
+    x = v.fit_transform(df['text_s'])
+    import scipy as sp
+    X = sp.sparse.hstack((x, X), format='csr')
 
-    strategy = {0:150}
-    oversample = SMOTE(sampling_strategy=strategy)
+    loaded_model = joblib.load('models/age_model.sav')
+    df['age'] = loaded_model.predict(X)
+    return df
 
-    X_sm, y_sm = oversample.fit_resample(X_train, y_train)
-
-
-
-    if classifier == 'nb':
-        nb(X_sm, X_test, y_sm, y_test)
-    elif classifier == 'lr':
-        lr(X_sm, X_test, y_sm, y_test)
-    elif classifier == 'rf':
-        rf(X_sm, X_test, y_sm, y_test)
-    else:
-        sgd(X_sm, X_test, y_sm, y_test)
-    # param_grid = [{'logisticregression__C': [1, 10, 100, 1000]}
+    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.3, random_state=33, stratify=y)
+    #
+    # strategy = {0:150}
+    # oversample = SMOTE(sampling_strategy=strategy)
+    #
+    # X_sm, y_sm = oversample.fit_resample(X_train, y_train)
+    #
+    # if classifier == 'nb':
+    #     nb(X_sm, X_test, y_sm, y_test)
+    # elif classifier == 'lr':
+    #     lr(X_sm, X_test, y_sm, y_test)
+    # elif classifier == 'rf':
+    #     rf(X_sm, X_test, y_sm, y_test)
+    # else:
+    #     sgd(X_sm, X_test, y_sm, y_test)
+    # # param_grid = [{'logisticregression__C': [1, 10, 100, 1000]}
     # gs = GridSearchCV(pipe, param_grid)
     # gs.fit(X, y)
 
 
+def marital_status(df):
+
+    family = ['children', 'kids', 'son', 'daughter', 'dad', 'father', 'mom', 'mother']
+    couple = ['husband', 'wife', 'spouse', 'girlfriend', 'boyfriend', 'partner']
+
+    df['marital_status'] = df['text_w'].apply(lambda x: 'family' if(any(i in x for i in family)) else ('couple' if (any(i in x for i in couple)) else 'unknown'))
+
+    return df
+
 if __name__ == '__main__':
     df_comments = pd.read_csv(os.path.join(INPUT_PATH, INPUT_FILENAME))
     df_demographics = read_comments_from_files(DEMOGRAPHICS_PATH, user_profiles=True)
+
     # Join dataframes
     df = df_comments.merge(df_demographics, on='username', how='inner')
 
+    # marital status
+    df = marital_status(df)
+
     # Gender Prediction Process
-    gender_prediction(df, classifier='rf')
+    gender_prediction(df, classifier='lr')
 
     # Age Prediction Process
     age_prediction(df, classifier='rf')
+
+
 
     print()
 

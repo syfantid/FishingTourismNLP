@@ -48,6 +48,9 @@ visualize_topics = True
 user_profile_analysis = True
 
 
+
+
+
 def replace_locations(text):
     regex = r"kefalonia|zante|zak(?:i|y)+nthos|rhodes|mykonos|kos|paros|poros|koroni|santorini|thassos|iraklitsa|" \
             r"lefkada|l(?:e|i)+mnos|kissamos|milos|samos|skiathos|faliraki"
@@ -130,20 +133,8 @@ def dummy_fun(doc):
     return doc
 
 
-def ngrams(words, l1, l2):
-    """
-    words: words for which we create the vector
-    l1: lower limit for ngrams
-    l2: upper limit for ngrams
-    Returns the vectors and the vocaabulary
-    """
-    cv = CountVectorizer(ngram_range=(l1, l2), tokenizer=dummy_fun, preprocessor=dummy_fun, token_pattern=r'\b\w+\b',
-                         min_df=1)
-    ngrams = cv.fit_transform(words)
-    return ngrams, cv
 
-
-def tfidf(text):
+def tf_idf(text):
     vect = TfidfVectorizer(max_df=0.8, max_features=200000,
                            min_df=0.2, stop_words='english',
                            use_idf=True, tokenizer=tokenize_and_stem, ngram_range=(1, 2))
@@ -381,45 +372,63 @@ def setup_variables():
     return filepath, text_column, title_column, output_filepath, processed_filepath
 
 
-if __name__ == '__main__':
+def processing_steps(df, text_column, title_column):
+    # Filter out entries without text (comment field is nan)
+    print('Filtering out empty-text reviews..')
+    df.dropna(subset=[text_column], inplace=True)
+
+    # Text cleaning
+    print("Cleaning text...")
+    df['text_p'] = df[text_column].apply(lambda x: text_cleaning(x))  # for user profiles
+
+    # Filter out non-English entries
+    print('Filtering out non-English reviews...')
+    df = df[df['text_p'].map(lambda x: is_english(x))]
+
+    # Replacing names and tour locations
+    print("Replacing owner and crew's names and tour locations...")
+    df['text_p'] = df['text_p'].apply(lambda x: replace_owner_names(x))
+    df['text_p'] = df['text_p'].apply(lambda x: replace_locations(x))
+
+    # Tokenization, Lemmatization and Stemming
+    print("Tokenization, Lemmatization and Stemming...")
+    df['text_w'] = df['text_p'].apply(lambda x: tokenize(x))
+    df['text_l'] = df['text_p'].apply(lambda x: tokenize_and_lemma(x))
+    df['text_s'] = df['text_p'].apply(lambda x: tokenize_and_stem(x))
+    # df['title_p'] = df['title'].apply(lambda x: text_cleaning(x))  # for business reviews
+    df['title_p'] = df[title_column].apply(lambda x: text_cleaning(x))  # for user profiles
+    df['title_w'] = df['title_p'].apply(lambda x: tokenize(x))
+    df['title_l'] = df['title_p'].apply(lambda x: tokenize_and_lemma(x))
+    df['title_s'] = df['text_p'].apply(lambda x: tokenize_and_stem(x))
+
+    return df
+
+
+def n_grams(words, l1, l2):
+    """
+    words: words for which we create the vector
+    l1: lower limit for ngrams
+    l2: upper limit for ngrams
+    Returns the vectors and the vocaabulary
+    """
+    cv = CountVectorizer(ngram_range=(l1, l2), tokenizer=dummy_fun, preprocessor=dummy_fun, token_pattern=r'\b\w+\b',
+                         min_df=1)
+    ngrams = cv.fit_transform(words)
+    return ngrams, cv
+
+
+def preprocess_data():
     filepath, text_column, title_column, output_filepath, processed_filepath = setup_variables()
     if os.path.exists(processed_filepath):
         df = pd.read_csv(processed_filepath)
     else:
         df = read_comments_from_files(input=filepath, user_profiles=user_profile_analysis)
-
-        # Filter out entries without text (comment field is nan)
-        print('Filtering out empty-text reviews..')
-        df.dropna(subset=[text_column], inplace=True)
-
-        # Text cleaning
-        print("Cleaning text...")
-        df['text_p'] = df[text_column].apply(lambda x: text_cleaning(x))  # for user profiles
-
-        # Filter out non-English entries
-        print('Filtering out non-English reviews...')
-        df = df[df['text_p'].map(lambda x: is_english(x))]
-
-        # Replacing names and tour locations
-        print("Replacing owner and crew's names and tour locations...")
-        df['text_p'] = df['text_p'].apply(lambda x: replace_owner_names(x))
-        df['text_p'] = df['text_p'].apply(lambda x: replace_locations(x))
-
-        # Tokenization, Lemmatization and Stemming
-        print("Tokenization, Lemmatization and Stemming...")
-        df['text_w'] = df['text_p'].apply(lambda x: tokenize(x))
-        df['text_l'] = df['text_p'].apply(lambda x: tokenize_and_lemma(x))
-        df['text_s'] = df['text_p'].apply(lambda x: tokenize_and_stem(x))
-        # df['title_p'] = df['title'].apply(lambda x: text_cleaning(x))  # for business reviews
-        df['title_p'] = df[title_column].apply(lambda x: text_cleaning(x))  # for user profiles
-        df['title_w'] = df['title_p'].apply(lambda x: tokenize(x))
-        df['title_l'] = df['title_p'].apply(lambda x: tokenize_and_lemma(x))
-        df['title_s'] = df['text_p'].apply(lambda x: tokenize_and_stem(x))
+        df = processing_steps(df, text_column, title_column)
 
     # Ngram and tfidf Vectors
     print("N-grams and TF-IDF Vectors...")
-    ngrams, ngram_voc = ngrams(df['text_l'], 2, 4)  # returns bigrams and trigrams
-    tfidf, tfidf_voc = tfidf(df['text_p'])  # returns unigrams
+    ngrams, ngram_voc = n_grams(df['text_l'], 2, 4)  # returns bigrams and trigrams
+    tfidf, tfidf_voc = tf_idf(df['text_p'])  # returns unigrams
 
     # topics extraction
     # Identifying the optimal number of clusters
@@ -450,3 +459,5 @@ if __name__ == '__main__':
     word_frequencies_graph(df['text_p'], output_filepath)
 
     df.to_csv(os.path.join(output_filepath,'processed_dataframe.csv'))
+
+# preprocess_data()

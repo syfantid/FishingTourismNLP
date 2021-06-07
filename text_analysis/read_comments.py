@@ -25,7 +25,7 @@ def read_comments_from_files(input, user_profiles=False):
     path_list = Path(absolute_input_path).rglob('*.csv')
     for path in path_list:
         path_str = str(path)  # because path is object not string
-        file_df = pd.read_csv(path_str)
+        file_df = pd.read_csv(path_str, delimiter=';')
         if user_profiles:
             username = get_username_from_filename(path_str)
             file_df['username'] = username

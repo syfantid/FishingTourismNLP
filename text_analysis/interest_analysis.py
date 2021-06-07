@@ -38,8 +38,13 @@ def get_expertise_badges(df_badges):
     value_counts = expertise_badges.badge.value_counts()
     photographer_levels = ['New Photographer', 'Beginner Photographer', 'Junior Photographer', 'Photographer', 'Senior Photographer', 'Top Photographer']
     value_counts = adjust_graded_levels(value_counts, photographer_levels)
-    plt.barh(value_counts.index, value_counts)
+    total_counts = len(set(df_badges.username))
+    value_percentages = value_counts / total_counts
+    plt.barh(value_counts.index, value_percentages)
+    plt.xlabel("Percentage of users holding the badge")
+    plt.title("% of users per Expertise Badge")
     plt.savefig(os.path.join(INPUT_PATH, 'user_expertise_badges.jpg'))
+    plt.clf()
 
 
 def get_explorer_badges(df_badges):
@@ -55,8 +60,11 @@ def get_reviewer_badges(df_badges):
     total_counts = sum(value_counts)
     value_percentages = value_counts / total_counts
 
-    plt.barh(value_counts.index, value_percentages)
+    plt.barh(np.array(value_counts.index), np.array(value_percentages))
+    plt.xlabel("Percentage of users holding the badge")
+    plt.title("% of users per Reviewer Badge")
     plt.savefig(os.path.join(INPUT_PATH, 'reviewer_badges.jpg'))
+    plt.clf()
 
 
 def convert_to_numeric_index(s):
@@ -77,10 +85,13 @@ def get_passport_badges(df_badges):
 
 
     plt.plot(value_counts)
+    plt.xlabel("Number of destinations visited")
+    plt.ylabel("Number of users")
+    plt.title("Number of destinations visited per user (Passport Badge)")
     # plt.show()
     # counts = int(value_counts.index)
     plt.savefig(os.path.join(INPUT_PATH, 'passport_badges.jpg'))
-
+    plt.clf()
 
 if __name__ == '__main__':
     # df_comments = pd.read_csv(os.path.join(INPUT_PATH, INPUT_FILENAME))
@@ -92,19 +103,10 @@ if __name__ == '__main__':
     get_passport_badges(df_badges)
 
     # Get information about reviewer badges
-    # get_reviewer_badges(df_badges)
+    get_reviewer_badges(df_badges)
     #
     # # Get information about expertise badges
-    # get_expertise_badges(df_badges)
+    get_expertise_badges(df_badges)
     #
     # Get information about explorer badges
     get_explorer_badges(df_badges)
-
-
-
-    top_terms_badge_subtext = df_badges['badge_subtext'].value_counts()[:20]
-    top_terms_badge = df_badges['badge'].value_counts()[:20]
-
-    # plt.hist(top_terms_badge)
-    # plt.xticks(rotation='vertical')
-    # plt.show()

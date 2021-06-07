@@ -44,8 +44,8 @@ from matplotlib import rcParams
 
 rcParams.update({'figure.autolayout': True})
 
-visualize_topics = True
-user_profile_analysis = True
+visualize_topics = False
+user_profile_analysis = False
 
 
 
@@ -422,7 +422,7 @@ def preprocess_data():
     if os.path.exists(processed_filepath):
         df = pd.read_csv(processed_filepath)
     else:
-        df = read_comments_from_files(input=filepath, user_profiles=user_profile_analysis)
+        df = read_comments_from_files(input=filepath, user_profiles=user_profile_analysis, delimiter=',')
         df = processing_steps(df, text_column, title_column)
 
     # Ngram and tfidf Vectors
@@ -458,6 +458,6 @@ def preprocess_data():
     ngrams_cloud(df['text_p'], output_filepath)
     word_frequencies_graph(df['text_p'], output_filepath)
 
-    df.to_csv(os.path.join(output_filepath,'processed_dataframe.csv'))
+    df.to_csv(os.path.join(output_filepath, 'processed_dataframe.csv'))
 
 # preprocess_data()

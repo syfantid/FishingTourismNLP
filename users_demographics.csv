@@ -6,12 +6,12 @@ username,gender,age,marital_status
 139ur_aa.csv,man,35-49,unknown
 13meeganp.csv,woman,35-49,family
 151fabianan.csv,woman,35-49,family
-153estherj.csv,Woman,35-49,family
+153estherj.csv,woman,35-49,family
 162majdib.csv,man,35-49,family
 176lefterisl.csv,['man' 'woman'],['35-49' '50-64'],unknown
 177eleanas.csv,woman,35-49,unknown
 177johnt.csv,woman,35-49,family
-180graemek.csv,Man,35-49,family
+180graemek.csv,man,35-49,family
 181NeilH.csv,woman,35-49,couple
 186maryannep.csv,woman,35-49,couple
 18joer.csv,woman,['35-49' '50-64'],family
@@ -50,9 +50,9 @@ username,gender,age,marital_status
 483balana.csv,man,35-49,unknown
 534DavidJ.csv,man,35-49,family
 542phaedral.csv,man,35-49,family
-547deec.csv,Woman,35-49,family
+547deec.csv,woman,35-49,family
 568tareks.csv,woman,35-49,unknown
-571AlanC571.csv,Man,35-49,family
+571AlanC571.csv,man,35-49,family
 574willg.csv,woman,35-49,unknown
 575famk.csv,man,50-64,unknown
 575garyn.csv,man,['35-49' '50-64'],family
@@ -60,7 +60,7 @@ username,gender,age,marital_status
 597vagelisa.csv,woman,50-64,unknown
 601Jude56.csv,woman,50-64,family
 618octavianp.csv,woman,35-49,unknown
-61JF2016.csv,Woman,50-64,unknown
+61JF2016.csv,woman,50-64,unknown
 6245gillian.csv,woman,35-49,family
 656kirsil.csv,woman,35-49,family
 658derekb.csv,man,50-64,family
@@ -83,7 +83,7 @@ username,gender,age,marital_status
 750deanm.csv,woman,35-49,family
 750johannac.csv,woman,35-49,family
 768stathist.csv,woman,35-49,unknown
-779romans.csv,Man,35-49,family
+779romans.csv,man,35-49,family
 782tessac.csv,woman,50-64,unknown
 78chengchengc.csv,woman,35-49,family
 798tabitas.csv,woman,35-49,unknown
@@ -115,7 +115,7 @@ username,gender,age,marital_status
 951naomih.csv,woman,35-49,family
 952lindav.csv,woman,50-64,family
 953larsg.csv,woman,35-49,unknown
-958jackf.csv,Man,35-49,unknown
+958jackf.csv,man,35-49,unknown
 974pippap.csv,woman,50-64,family
 977charal.csv,['man' 'woman'],['35-49' '50-64'],unknown
 982ruthf.csv,woman,50-64,family
@@ -156,7 +156,7 @@ AugoustinosKall.csv,woman,35-49,family
 B-RAM2009.csv,woman,35-49,unknown
 B3401IVpetern.csv,woman,35-49,unknown
 BPC1710.csv,woman,35-49,family
-Bardsey123.csv,Man,35-49,family
+Bardsey123.csv,man,35-49,family
 BatKick.csv,woman,18-24,family
 Beatkinda.csv,woman,35-49,unknown
 BeccaFann.csv,woman,35-49,unknown
@@ -172,7 +172,7 @@ CARochaPT.csv,woman,35-49,family
 CCPNewYorkCity.csv,woman,35-49,family
 CConnell19.csv,woman,35-49,family
 CMcPW.csv,woman,35-49,family
-CamembertBedford.csv,Man,35-49,family
+CamembertBedford.csv,man,35-49,family
 Camper524986.csv,woman,35-49,family
 Camper546268.csv,woman,35-49,unknown
 CatLB27.csv,woman,35-49,family
@@ -198,7 +198,7 @@ DRW1100.csv,woman,35-49,couple
 Davedurose.csv,woman,35-49,family
 DavidRebecca.csv,man,35-49,family
 DavidandJax.csv,woman,35-49,family
-Dawniebrander.csv,Woman,35-49,family
+Dawniebrander.csv,woman,35-49,family
 DebsWalsh.csv,woman,35-49,family
 DeepFriedDodo.csv,woman,35-49,unknown
 DeniseJarrow.csv,woman,35-49,family
@@ -242,14 +242,14 @@ GIZMO654.csv,woman,35-49,family
 Gaelle123A.csv,woman,50-64,family
 Gardener009.csv,man,50-64,couple
 Garysuid.csv,woman,35-49,unknown
-GeertR194.csv,Man,35-49,family
+GeertR194.csv,man,35-49,family
 GerardR420.csv,woman,35-49,unknown
 Gian_b231982.csv,woman,35-49,unknown
 Gillian248.csv,woman,35-49,family
 GiorgosS162.csv,woman,['35-49' '50-64'],unknown
 Giorgos_alex7.csv,woman,35-49,unknown
 Global640546.csv,woman,35-49,unknown
-Go220667.csv,Woman,35-49,family
+Go220667.csv,woman,35-49,family
 Go337128.csv,woman,35-49,unknown
 Great_Expectations75.csv,man,35-49,family
 Greekaholics.csv,woman,50-64,unknown
@@ -291,7 +291,7 @@ JoSayer72.csv,woman,35-49,family
 JodyH777.csv,woman,35-49,couple
 JohnL2617.csv,woman,35-49,family
 JonathanXYZ.csv,woman,35-49,unknown
-JuliaS1205.csv,Woman,35-49,family
+JuliaS1205.csv,woman,35-49,family
 JulieHummelstown.csv,woman,35-49,family
 Juliemelville2019.csv,['man' 'woman'],35-49,unknown
 Just_me76.csv,woman,35-49,couple
@@ -303,12 +303,12 @@ KathleenB64.csv,woman,35-49,family
 KatieBristol2018.csv,woman,['35-49' '50-64'],unknown
 KatieP123456.csv,woman,35-49,unknown
 Katliappis.csv,woman,35-49,family
-KefaliniaSunseeker36.csv,Woman,35-49,family
+KefaliniaSunseeker36.csv,woman,35-49,family
 KefaloniaMike.csv,woman,35-49,family
 KeithM449.csv,woman,35-49,family
 KiiraAndMikko.csv,man,50-64,family
 Kkolenac.csv,man,35-49,unknown
-Konstantina1202.csv,Woman,35-49,family
+Konstantina1202.csv,woman,35-49,family
 KristinaP1821.csv,man,35-49,family
 KristinaP2066.csv,man,35-49,couple
 L5064XRsimonea.csv,woman,35-49,family
@@ -329,7 +329,7 @@ Livingstone1986.csv,woman,35-49,family
 LizMuntean.csv,woman,35-49,unknown
 LouiseCantrillGodden.csv,woman,50-64,family
 LoulaS11.csv,woman,35-49,unknown
-LucaMartinetto.csv,Man,['35-49' '50-64'],unknown
+LucaMartinetto.csv,man,['35-49' '50-64'],unknown
 LucasS8668.csv,woman,35-49,couple
 LucyI88.csv,woman,35-49,unknown
 Lucy_Alex_SPb.csv,woman,50-64,unknown
@@ -349,7 +349,7 @@ MariaD693.csv,woman,25-34,family
 Mariamcdx.csv,woman,50-64,unknown
 MarieP3768.csv,woman,35-49,couple
 Marioco9.csv,woman,35-49,family
-MarkE992.csv,Man,35-49,family
+MarkE992.csv,man,35-49,family
 Markv2624.csv,woman,35-49,unknown
 MarsB123.csv,woman,35-49,family
 MartinWJH.csv,man,50-64,family
@@ -365,7 +365,7 @@ MichaelJ6137.csv,woman,35-49,unknown
 Mike-Helsingborg1.csv,man,35-49,family
 Mike57d.csv,woman,35-49,family
 MissChef03.csv,man,35-49,family
-MissyTMaggee.csv,Woman,35-49,family
+MissyTMaggee.csv,woman,35-49,family
 MollyWilcox95.csv,woman,35-49,couple
 MorrisonJo.csv,woman,['35-49' '50-64'],unknown
 MrMZR.csv,woman,35-49,family
@@ -388,9 +388,9 @@ NinaB1867.csv,woman,35-49,unknown
 O2478YWtonyb.csv,woman,35-49,unknown
 O5451FAkenm.csv,woman,50-64,unknown
 O7359BH_.csv,woman,35-49,family
-Olgie_G.csv,Woman,35-49,family
+Olgie_G.csv,woman,35-49,family
 OnHolidayM.csv,woman,50-64,unknown
-Orengili.csv,Man,35-49,family
+Orengili.csv,man,35-49,family
 P8249UArichardm.csv,woman,50-64,family
 P9678OZ_.csv,woman,35-49,unknown
 Pailon7038.csv,woman,35-49,family
@@ -416,7 +416,7 @@ R7175OFmichelleb.csv,woman,35-49,family
 R7767OTkarinr.csv,woman,35-49,family
 RJM2202.csv,['man' 'woman'],50-64,family
 Rachel15F.csv,woman,35-49,family
-RachelA955.csv,Woman,35-49,family
+RachelA955.csv,woman,35-49,family
 RachelStewie.csv,woman,['35-49' '50-64'],unknown
 Ralukus.csv,woman,35-49,unknown
 Ramallah123.csv,['man' 'woman'],['35-49' '50-64'],unknown
@@ -424,7 +424,7 @@ Relax819796.csv,woman,50-64,family
 Rgio27.csv,woman,35-49,family
 RiteshP575.csv,man,35-49,family
 RomaPizza.csv,man,35-49,family
-Ronnieja.csv,Man,35-49,family
+Ronnieja.csv,man,35-49,family
 RosemaryW25.csv,['man' 'woman'],['35-49' '50-64'],family
 Rosetoo76.csv,woman,35-49,family
 RossiN_12.csv,man,25-34,family
@@ -442,7 +442,7 @@ S8042NNmandyb.csv,woman,50-64,family
 S8673EYsimonep.csv,woman,35-49,family
 SBandivas.csv,woman,25-34,family
 SDM41.csv,woman,35-49,family
-SWFUk.csv,Woman,35-49,family
+SWFUk.csv,woman,35-49,family
 SWnick68.csv,woman,35-49,unknown
 Safentou.csv,woman,35-49,family
 Salmonman69.csv,woman,35-49,unknown
@@ -481,7 +481,7 @@ Tinkledivories.csv,woman,35-49,family
 TommyB1990.csv,woman,50-64,couple
 Tour605907.csv,woman,35-49,family
 Tourist409477.csv,woman,35-49,unknown
-TraceyM260.csv,Woman,35-49,family
+TraceyM260.csv,woman,35-49,family
 Travelguyd.csv,man,35-49,family
 Trek654679.csv,woman,35-49,unknown
 Trisherfisher.csv,woman,35-49,unknown
@@ -514,18 +514,18 @@ X3475MFadamw.csv,woman,35-49,couple
 X6932XOlauraf.csv,woman,35-49,unknown
 X885CLneilm.csv,woman,35-49,family
 Xaviernica.csv,man,50-64,couple
-Y1422ASsusank.csv,Woman,35-49,family
+Y1422ASsusank.csv,woman,35-49,family
 Yclcu.csv,woman,35-49,family
 Z133QOjulies.csv,woman,35-49,unknown
 Z2661UObenjamins.csv,woman,35-49,family
 Z6833IRjoyceb.csv,man,50-64,family
 Zdvarko.csv,man,35-49,unknown
-Zoetheseasonsvillas.csv,Woman,50-64,unknown
+Zoetheseasonsvillas.csv,woman,50-64,unknown
 _F6504UA.csv,woman,35-49,unknown
 _J2070AG.csv,woman,35-49,unknown
 _V3453LL.csv,woman,35-49,unknown
 _allyangus.csv,woman,35-49,family
-a29nina.csv,Woman,35-49,unknown
+a29nina.csv,woman,35-49,unknown
 adamcbowen25.csv,woman,35-49,couple
 adriantracy.csv,woman,35-49,family
 adventuremen.csv,man,35-49,family
@@ -534,7 +534,7 @@ akallergis.csv,woman,35-49,family
 albertv359.csv,woman,50-64,unknown
 albinz.csv,man,35-49,family
 alexpapachristo.csv,woman,35-49,couple
-alexvandermeij.csv,Man,35-49,family
+alexvandermeij.csv,man,35-49,family
 ali_hutchison.csv,woman,35-49,family
 alina396.csv,woman,35-49,family
 alinalavinia_persa.csv,woman,35-49,unknown
@@ -542,7 +542,7 @@ alizh3.csv,['man' 'woman'],['35-49' '50-64'],family
 alsnyd1.csv,woman,50-64,family
 alwayshungry08.csv,man,35-49,family
 ambfra1981.csv,man,35-49,unknown
-amrisab.csv,Woman,35-49,couple
+amrisab.csv,woman,35-49,couple
 amyinamsterdam.csv,woman,35-49,family
 amyvM1352SU.csv,woman,35-49,unknown
 amywatson111.csv,woman,35-49,family
@@ -552,7 +552,7 @@ anastazjaz2019.csv,woman,35-49,unknown
 andyagar.csv,woman,35-49,unknown
 andym452.csv,woman,35-49,family
 ange6342.csv,woman,35-49,family
-angiesJ9776CL.csv,Woman,35-49,family
+angiesJ9776CL.csv,woman,35-49,family
 anitabI8027FA.csv,woman,35-49,couple
 annablume2014.csv,woman,35-49,couple
 annavgn.csv,woman,35-49,unknown
@@ -573,7 +573,7 @@ bastoz21.csv,woman,35-49,unknown
 bblerot.csv,woman,35-49,unknown
 beachhut2020.csv,woman,35-49,family
 begs2015.csv,woman,35-49,family
-benschofield17.csv,Man,35-49,family
+benschofield17.csv,man,35-49,family
 biekeleenknegt.csv,man,35-49,unknown
 billywood2404.csv,['man' 'woman'],35-49,unknown
 bj_todd54.csv,woman,35-49,family
@@ -594,7 +594,7 @@ ccaseace.csv,man,35-49,family
 celiao930.csv,woman,35-49,unknown
 cguevara.csv,man,35-49,couple
 chelseah330.csv,woman,35-49,unknown
-chichiki.csv,Woman,35-49,family
+chichiki.csv,woman,35-49,family
 chrisbI9075JI.csv,woman,35-49,family
 chriseggemeyer91.csv,woman,35-49,couple
 chrishZ2103GP.csv,['man' 'woman'],35-49,family
@@ -605,11 +605,11 @@ chriswright50.csv,woman,35-49,unknown
 ciprianp706.csv,man,50-64,family
 clairebailey1971.csv,man,50-64,unknown
 clairelE2854YL.csv,woman,35-49,family
-clairelouisac.csv,Woman,35-49,family
+clairelouisac.csv,woman,35-49,family
 claudel969.csv,man,35-49,unknown
 cocop286.csv,woman,35-49,unknown
 cona950.csv,woman,35-49,family
-conia673.csv,Woman,35-49,unknown
+conia673.csv,woman,35-49,unknown
 conorm763.csv,woman,35-49,unknown
 coologine.csv,woman,35-49,unknown
 cornelisv271.csv,woman,35-49,unknown
@@ -625,7 +625,7 @@ davidlK2320KL.csv,woman,35-49,unknown
 davidou40.csv,woman,35-49,family
 davidriggs32.csv,woman,35-49,family
 dawnquarles.csv,woman,35-49,family
-dayanc2015.csv,Woman,35-49,family
+dayanc2015.csv,woman,35-49,family
 dcarlando.csv,man,35-49,family
 debbien411.csv,woman,35-49,family
 dewh2o.csv,woman,50-64,couple
@@ -642,7 +642,7 @@ eilisWarwickshire.csv,woman,35-49,family
 eiphos_v.csv,woman,35-49,unknown
 elenaoseguera.csv,['man' 'woman'],35-49,family
 elenik929.csv,woman,35-49,unknown
-elisap503.csv,Woman,35-49,family
+elisap503.csv,woman,35-49,family
 elmdalton.csv,woman,35-49,unknown
 emilyhR3760BX.csv,man,35-49,family
 emilykatewoods.csv,woman,35-49,unknown
@@ -669,7 +669,7 @@ fw1204.csv,woman,35-49,family
 gabrield383.csv,woman,35-49,unknown
 gamanc2015.csv,['man' 'woman'],35-49,family
 garycheesley.csv,woman,35-49,family
-georgiea1974.csv,Woman,35-49,family
+georgiea1974.csv,woman,35-49,family
 georgioss381.csv,woman,35-49,family
 gerryp331.csv,woman,35-49,family
 ghowie82.csv,woman,35-49,family
@@ -706,7 +706,7 @@ irinabrouwer.csv,woman,35-49,unknown
 irinakH2849MP.csv,woman,35-49,unknown
 irini_alexa.csv,woman,35-49,family
 ismene_s2k.csv,woman,35-49,unknown
-ivank639.csv,Man,35-49,family
+ivank639.csv,man,35-49,family
 jamescV4878YV.csv,woman,35-49,unknown
 jamesonraid.csv,woman,50-64,family
 janaU3141VG.csv,woman,35-49,couple
@@ -715,7 +715,7 @@ janrS8723GH.csv,woman,35-49,family
 jilliane335.csv,woman,35-49,family
 jo4686.csv,['man' 'woman'],['35-49' '50-64'],unknown
 joc264.csv,['man' 'woman'],50-64,unknown
-joehL6827DZ.csv,Man,35-49,family
+joehL6827DZ.csv,man,35-49,family
 johanscarlet.csv,woman,35-49,unknown
 johnbO2855BC.csv,woman,35-49,unknown
 johnpL4110LB.csv,woman,35-49,family
@@ -760,7 +760,7 @@ laurenjessicankkm.csv,woman,35-49,family
 laurenth848.csv,man,35-49,family
 laurenwK8811CH.csv,woman,50-64,unknown
 laurynasm.csv,man,35-49,family
-lbjolicoeur.csv,Woman,35-49,family
+lbjolicoeur.csv,woman,35-49,family
 lbyton.csv,woman,35-49,couple
 leejosh3.csv,man,35-49,family
 leonidasp627.csv,['man' 'woman'],['35-49' '50-64'],family
@@ -773,7 +773,7 @@ lindseys535.csv,man,35-49,family
 lindseytolson51.csv,woman,35-49,unknown
 lisachaffey.csv,['man' 'woman'],35-49,unknown
 littlel606.csv,woman,25-34,couple
-lizzieh706.csv,Woman,35-49,family
+lizzieh706.csv,woman,35-49,family
 lngts.csv,woman,35-49,unknown
 louiseaL9506RT.csv,woman,35-49,family
 louiseperk88.csv,woman,35-49,family
@@ -803,7 +803,7 @@ matgaudreau.csv,woman,35-49,family
 matteo76va.csv,woman,35-49,couple
 matteoramundo.csv,woman,35-49,family
 mattesafa9111.csv,man,35-49,family
-maximk164.csv,Man,35-49,unknown
+maximk164.csv,man,35-49,unknown
 mcp12trip.csv,man,35-49,unknown
 mcpathens12.csv,woman,35-49,family
 meandmyboys1.csv,man,35-49,unknown
@@ -817,9 +817,9 @@ milenap628.csv,woman,35-49,unknown
 miloue97.csv,woman,50-64,family
 misspeppery.csv,woman,35-49,unknown
 mllrannie.csv,woman,50-64,unknown
-mom2781.csv,Woman,35-49,family
+mom2781.csv,woman,35-49,family
 mona_og_.csv,woman,35-49,family
-monicafI9620QC.csv,Woman,35-49,unknown
+monicafI9620QC.csv,woman,35-49,unknown
 mrpepper2016.csv,woman,35-49,unknown
 mskittykat74.csv,woman,35-49,family
 mtbury.csv,man,50-64,family
@@ -834,7 +834,7 @@ nelut2017.csv,woman,35-49,unknown
 nickbK3291XM.csv,woman,50-64,couple
 nickj989.csv,woman,35-49,family
 nickl255.csv,woman,35-49,family
-nicofelea.csv,Woman,['35-49' '50-64'],family
+nicofelea.csv,woman,['35-49' '50-64'],family
 nikolakopczynska.csv,man,35-49,family
 nikolaosp582.csv,woman,['35-49' '50-64'],family
 nikolask502.csv,woman,50-64,couple
@@ -874,7 +874,7 @@ rainbow7770.csv,man,35-49,family
 reannej2018.csv,woman,35-49,family
 rebeccakW6199WG.csv,woman,['35-49' '50-64'],family
 richardbR9672AR.csv,woman,['35-49' '50-64'],unknown
-richardk337.csv,Man,35-49,couple
+richardk337.csv,man,35-49,couple
 richardsX8512XZ.csv,woman,['35-49' '50-64'],unknown
 rjay2017.csv,man,35-49,unknown
 robboh890.csv,['man' 'woman'],35-49,unknown
@@ -893,7 +893,7 @@ samcW7494GJ.csv,woman,35-49,unknown
 sammig30.csv,woman,35-49,family
 sammyjenkins89.csv,woman,50-64,couple
 sandragB1575ER.csv,woman,35-49,unknown
-sannaengqvistschmitz.csv,Woman,35-49,family
+sannaengqvistschmitz.csv,woman,35-49,family
 sar79_Lan.csv,woman,35-49,family
 sarahwU4227ZB.csv,woman,35-49,family
 seank293.csv,man,35-49,couple
@@ -913,13 +913,13 @@ spyrosk412.csv,woman,35-49,unknown
 ss1252014.csv,woman,35-49,family
 sseverin1234.csv,['man' 'woman'],35-49,family
 staceyfT7248MH.csv,woman,35-49,family
-stagefright2016.csv,Man,35-49,family
+stagefright2016.csv,man,35-49,family
 stavros50.csv,woman,35-49,family
 steliospsathas.csv,['man' 'woman'],['35-49' '50-64'],unknown
 stephanielF9056DC.csv,woman,35-49,unknown
 stepharena.csv,woman,35-49,couple
 stewarte_11.csv,man,35-49,family
-sued693.csv,Man,50-64,family
+sued693.csv,man,50-64,family
 sueh812018.csv,man,50-64,unknown
 sunnySilvi.csv,woman,35-49,unknown
 sunshine_tallett.csv,woman,35-49,couple
@@ -935,7 +935,7 @@ tobiasminast.csv,woman,35-49,unknown
 tomlA1824ZU.csv,woman,35-49,unknown
 tracietdt1970.csv,woman,35-49,family
 tropicskincarehelen.csv,woman,35-49,family
-ttzenos.csv,Man,35-49,family
+ttzenos.csv,man,35-49,family
 twistybird.csv,woman,35-49,family
 tzekos13.csv,woman,50-64,unknown
 ushmag2019.csv,['man' 'woman'],35-49,unknown
@@ -952,7 +952,7 @@ watermelon77.csv,woman,35-49,family
 webkal.csv,woman,35-49,family
 wendymaggs01.csv,woman,35-49,unknown
 weysprings.csv,woman,35-49,family
-whiteape.csv,Man,35-49,family
+whiteape.csv,man,35-49,family
 willd157.csv,woman,50-64,family
 williamhY1076LE.csv,woman,35-49,unknown
 wrigleydiggley.csv,woman,35-49,unknown

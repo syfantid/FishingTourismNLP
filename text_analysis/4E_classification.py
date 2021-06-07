@@ -1,8 +1,9 @@
 import os
 import re
+import string
 
 import pandas as pd
-import seaborn as sns;
+import seaborn as sns
 
 from utils import ROOT_DIR
 
@@ -93,7 +94,7 @@ def create_frequency_heatmap(df):
     plt.clf()
 
 
-def demographics_4e_visualization(df):
+def demographics_4e_visualization(df_users):
     pass
 
 
@@ -117,20 +118,93 @@ def aggregate_demographics_per_user(df):
 
 
 # todo: Calculate interrater agreement
+def get_username(df):
+    def get_username_from_url(url):
+        regex = r"(?:https://www.tripadvisor.com/Profile/)(.*)"
+        username = re.search(regex, url).group(1)
+        return username + '.csv'
+
+    df_all = pd.read_csv(os.path.join(ROOT_DIR, 'text_analysis', 'output', 'output_business_profiles', 'processed_dataframe.csv'))
+    df_all['username'] = df_all.apply(lambda row: get_username_from_url(row['reviewer_profile']), axis=1)
+    df_all = df_all[['username', 'text']]
+    df_merged = df.merge(df_all, left_on='text', right_on='text', how='left')
+    return df_merged
+
+
+def visualize_demographics(df, e):
+    # Visualize gender
+    total = df['gender'].value_counts().sum()
+    man_perc = df['gender'].value_counts().man/total
+    woman_perc = df['gender'].value_counts().woman/total
+    y = np.array([man_perc, woman_perc, max(0,1-man_perc-woman_perc)])
+    mylabels = ["Man", "Woman", "N/A"]
+    plt.pie(y, startangle=90, autopct='%1.0f%%', pctdistance=1.1, labeldistance=1.2)
+    plt.title('Gender distribution for the {} dimension'.format(e))
+    plt.legend(mylabels, bbox_to_anchor=(1,0), loc="lower right",
+                          bbox_transform=plt.gcf().transFigure)
+    # plt.legend(mylabels, loc="lower right")
+    plt.savefig(os.path.join('output', 'output_4E', 'gender_{}.png'.format(e)))
+    plt.clf()
+
+    # Visualize age group
+    total = df['age'].value_counts().sum()
+    a_35_49 = df['age'].value_counts()['35-49'] / total
+    a_50_64 = df['age'].value_counts()['50-64'] / total
+    a_25_34 = df['age'].value_counts()['25-34'] / total
+    y = np.array([a_25_34, a_35_49, a_50_64])
+    mylabels = ["25-34", "35-49", "50-64"]
+    plt.pie(y, startangle=90, autopct='%1.0f%%', pctdistance=1.1, labeldistance=1.2)
+    plt.title('Age distribution for the {} dimension'.format(e))
+    plt.legend(mylabels, loc="lower right")
+    plt.savefig(os.path.join('output', 'output_4E', 'age_{}.png'.format(e)))
+    plt.clf()
+
+    # Visualize marital status
+    total = df['marital_status'].value_counts().sum()
+    a_couple = df['marital_status'].value_counts()['couple'] / total
+    a_family = df['marital_status'].value_counts()['family'] / total
+    a_unknown = df['marital_status'].value_counts()['unknown'] / total
+    y = np.array([a_couple, a_family, a_unknown])
+    mylabels = ["Couple", "Family", "N/A"]
+    plt.pie(y, startangle=90, autopct='%1.0f%%', pctdistance=1.1, labeldistance=1.2)
+    plt.title('Marital status distribution for the {} dimension'.format(e))
+    plt.legend(mylabels, loc="lower right")
+    plt.savefig(os.path.join('output', 'output_4E', 'marital_status_{}.png'.format(e)))
+    plt.clf()
+
+def random_selection_for_ambiguous_users(df_users):
+    df_users['age'] = df_users.apply(lambda row: row['age'][0] if isinstance(row['age'], np.ndarray) else row['age'], axis=1)
+    df_users['gender'] = df_users.apply(lambda row: row['gender'][0] if isinstance(row['gender'], np.ndarray) else row['gender'], axis=1)
+    return df_users
+
+
 if __name__ == '__main__':
+    # Read reviews from annotated files
+    filepath = os.path.join(INPUT_PATH, 'processed_dataframe.csv')
+    if os.path.exists(filepath):
+        df = pd.read_csv(filepath)
+    else:
+        df = read_comments_from_files(ANNOTATED_PATH, user_profiles=True)
+        df = processing_steps(df, 'text', 'title')
+        df.to_csv(filepath)
+    # Get username for annotated reviews
+    df = get_username(df)
+
+    # Read user demographics
     df_demographics = pd.read_csv(os.path.join(ROOT_DIR, 'df_with_demographics.csv'))
+    df_demographics['gender'] = df_demographics.apply(lambda row: row['gender'].lower(), axis=1)
+    # Aggregate demographics per user
     df_users = aggregate_demographics_per_user(df_demographics)
-    print()
+    df_users = random_selection_for_ambiguous_users(df_users)
+
+    # Aggregate demographics with the annotated reviews
+    df_with_demographics = df.merge(df_users, left_on='username_y', right_index=True, how='left')
+
+    for e in E_s:
+        df_e = df_with_demographics[df_with_demographics[e] == 1]
+        visualize_demographics(df_e, e)
 
     # Visualize dimensions (4Es) coexistence
-    # df = read_comments_from_files(ANNOTATED_PATH, user_profiles=True)
-    # filepath = os.path.join(INPUT_PATH, 'processed_dataframe.csv')
-    # if os.path.exists(filepath):
-    #     df = pd.read_csv(filepath)
-    # else:
-    #     df = processing_steps(df, 'text', 'title')
-    #     df.to_csv(filepath)
-    #
     # create_coexistence_heatmap(df)
     # create_frequency_heatmap(df)
 

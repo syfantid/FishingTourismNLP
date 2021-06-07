@@ -220,4 +220,4 @@ def scrape_enterprises(input_filename):
             scrape_enterprise(enterprise_name.strip(" ") + ".csv", url)
             time.sleep(1)
 
-scrape_enterprises("Fishing_Vessels_FT_f.xls")
+# scrape_enterprises("Fishing_Vessels_FT_f.xls")

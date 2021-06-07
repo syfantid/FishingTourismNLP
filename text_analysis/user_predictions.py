@@ -382,10 +382,12 @@ if __name__ == '__main__':
     df = marital_status(df)
 
     # Gender Prediction Process
-    gender_prediction(df, classifier='lr')
+    df = gender_prediction(df, classifier='lr')
 
     # Age Prediction Process
-    age_prediction(df, classifier='rf')
+    df = age_prediction(df, classifier='rf')
+
+    # 4Es Prediction Process
 
 
 
